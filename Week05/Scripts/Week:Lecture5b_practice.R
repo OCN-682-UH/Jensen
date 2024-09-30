@@ -104,5 +104,7 @@ library(lubridate)
 Cond_Data <- read_csv(here("Week05","Data", "CondData.csv"))
 view(Cond_Data)
 
-Cond_Data <- Cond_Data %>%
+Cond_Data_clean <- Cond_Data %>%
+  mutate(date = mdy_hms(date))
+ view(Cond_Data_clean)
  
