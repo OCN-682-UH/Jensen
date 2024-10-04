@@ -1,0 +1,162 @@
+---
+title: "Lecture_6b_practice"
+author: "Kassandra Jensen"
+date: "2024-10-04"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE,
+                      warning = FALSE, 
+                      message = FALSE,
+                      fig.path = "../../output/")
+
+getwd()
+
+```
+<!-- This line is commented, wont show in the document -->
+```{r}
+
+# We can change lots of aspects of the figure right in our markdown document:
+# change size
+# change resolution
+# change "device" (i.e. is it a .png. .pdf, etc.)
+# save it in a specific folder
+```
+
+# Intro to penguins
+Today we are going to work with the penguin data to learn _RMarkdown_
+```{r}
+library(palmerpenguins)
+library(here)
+library(tidyverse)
+library(wesanderson)
+```
+
+# Inspect the data
+```{r}
+glimpse(penguins)
+```
+# Using multiple plots to show how you can change figures in markdown
+# Make a plot
+```{r penguinplot2, out.width= "70%", fig.cap="Example plot for class", dev="pdf"}
+ggplot(data= penguins, # Call data
+       mapping = aes(x = sex,
+                     y= body_mass_g,
+                     group = species,
+                     fill = species)) +
+  geom_violin() +                   ## Violin plot
+  facet_grid(species ~ sex) +       ## Facet_grid by species and sex. Formatting looked best as grid rather than wrap
+  labs(x = "Penguin Sex",           ## Add titles
+       y = "Body Mass (g)",
+       color = "species",
+       title = "Penguin Species Comparisons",
+       subtitle = "Size comparison of penguins by species and sex") +
+  scale_fill_manual(values = wes_palette("GrandBudapest1")) + ## Add color palette from wesanderson package
+  theme_minimal() +                                           ## theme_minimal() to add customizations on top
+  theme(
+    axis.title = element_text(size = 15, color = wes_palette("GrandBudapest1")[3]),
+    panel.background = element_rect(fill = "linen"),
+    plot.background = element_rect(fill = "white"),           ## Background saved as grey before so changed it to white
+    plot.title = element_text(size = 20, color = wes_palette("Moonrise1")[2]),
+    plot.subtitle = element_text(size = 10, color = wes_palette("IsleofDogs1")[2])) ## Just having fun with all the color options. 
+
+
+```
+
+# Make a plot
+```{r penguinplot, fig.height=3, fig.width=4}
+ggplot(data= penguins, # Call data
+       mapping = aes(x = sex,
+                     y= body_mass_g,
+                     group = species,
+                     fill = species)) +
+  geom_violin() +                   ## Violin plot
+  facet_grid(species ~ sex) +       ## Facet_grid by species and sex. Formatting looked best as grid rather than wrap
+  labs(x = "Penguin Sex",           ## Add titles
+       y = "Body Mass (g)",
+       color = "species",
+       title = "Penguin Species Comparisons",
+       subtitle = "Size comparison of penguins by species and sex") +
+  scale_fill_manual(values = wes_palette("GrandBudapest1")) + ## Add color palette from wesanderson package
+  theme_minimal() +                                           ## theme_minimal() to add customizations on top
+  theme(
+    axis.title = element_text(size = 15, color = wes_palette("GrandBudapest1")[3]),
+    panel.background = element_rect(fill = "linen"),
+    plot.background = element_rect(fill = "white"),           ## Background saved as grey before so changed it to white
+    plot.title = element_text(size = 20, color = wes_palette("Moonrise1")[2]),
+    plot.subtitle = element_text(size = 10, color = wes_palette("IsleofDogs1")[2])) ## Just having fun with all the color options. 
+
+
+```
+
+# Make a plot
+```{r penguinplot3, fig.asp=1.2, fig.align="center"}
+ggplot(data= penguins, # Call data
+       mapping = aes(x = sex,
+                     y= body_mass_g,
+                     group = species,
+                     fill = species)) +
+  geom_violin() +                   ## Violin plot
+  facet_grid(species ~ sex) +       ## Facet_grid by species and sex. Formatting looked best as grid rather than wrap
+  labs(x = "Penguin Sex",           ## Add titles
+       y = "Body Mass (g)",
+       color = "species",
+       title = "Penguin Species Comparisons",
+       subtitle = "Size comparison of penguins by species and sex") +
+  scale_fill_manual(values = wes_palette("GrandBudapest1")) + ## Add color palette from wesanderson package
+  theme_minimal() +                                           ## theme_minimal() to add customizations on top
+  theme(
+    axis.title = element_text(size = 15, color = wes_palette("GrandBudapest1")[3]),
+    panel.background = element_rect(fill = "linen"),
+    plot.background = element_rect(fill = "white"),           ## Background saved as grey before so changed it to white
+    plot.title = element_text(size = 20, color = wes_palette("Moonrise1")[2]),
+    plot.subtitle = element_text(size = 10, color = wes_palette("IsleofDogs1")[2])) ## Just having fun with all the color options. 
+
+
+```
+
+# Table example 
+
+| Time  | Session | Topic    |
+|:------|:-------:|---------:|
+| _left_ | _center_| _right_ |
+| 01:00  | 1       | Anatomy |
+| 01:50  |         | *Break* |
+| 02:00  | 2       | Tables  |
+| 02:45  |         | *Break* |
+
+# Tables with kable
+```{r}
+library(kableExtra)
+library(palmerpenguins)
+library(tidyverse)
+
+penguins %>%
+  group_by(species) %>%
+  summarise(billmean = mean(bill_length_mm, na.rm = TRUE)) %>%
+  kbl()  # make it a kable table ## this is all you have to do
+
+## Another example
+penguins %>%
+  group_by(species) %>%
+  summarise(billmean = mean(bill_length_mm, na.rm = TRUE)) %>%
+  kbl() %>% # make it a kable table
+  kable_classic() %>%
+  row_spec(2, bold = T, color = "white", background = "red")%>%
+  kable_styling(full_width = FALSE) ## this helped to make it more narrow
+```
+
+```{r}
+#notes:
+#  ../ = goes to up a folder
+#
+
+## fun stuff
+
+library(memer)
+meme_get("DistractedBf") %>% 
+  meme_text_distbf("Silly R package", "OCN 682 students", "actual coding")
+```
+
+

@@ -1,0 +1,17 @@
+---
+title: "Week_6_Homework"
+author: "Kassandra Jensen"
+date: "2024-10-04"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Directions
+#### Take any of the data sheets you have already worked with in class and create at least one table and one figure in an Rmarkdown file.
+#### Create the most beautiful RMarkdown output you can in either an html, github doc, or pdf format. YOU MUST KNIT THE FILE
+#### Make sure you have headings with clear explanations of what you are doing.
+#### Practice using markdown formatting with bold, italics, and lists (use each of these at least once).
+#### Make sure your outputs and scripts are saved in the appropriate folders. Keep proper coding etiquette (figures need to be pub quality as usual and you need to comment your code).
