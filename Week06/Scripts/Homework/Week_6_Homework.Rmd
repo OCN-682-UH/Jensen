@@ -15,3 +15,64 @@ knitr::opts_chunk$set(echo = TRUE)
 #### Make sure you have headings with clear explanations of what you are doing.
 #### Practice using markdown formatting with bold, italics, and lists (use each of these at least once).
 #### Make sure your outputs and scripts are saved in the appropriate folders. Keep proper coding etiquette (figures need to be pub quality as usual and you need to comment your code).
+
+```{r}
+library(tidyverse)
+library(here)
+library(kableExtra)
+```
+
+```{r}
+site_data <- read_csv(here("Week05", "Data", "site.characteristics.data.csv"))
+
+head(site_data)
+tail(site_data)
+
+site_data_mean <- site_data %>%
+  group_by(name, parameter.measured) %>%
+  summarise(mean_values = mean(values, na.rm = TRUE)) 
+
+```
+
+```{r}
+site_data_wide <- site_data %>%
+  group_by(name, parameter.measured) %>%
+  summarise(mean_values = mean(values, na.rm = TRUE)) %>%
+  pivot_wider(names_from = parameter.measured,
+              values_from = mean_values) %>%
+ select(algal.cover, CCA.cover, coral.cover, substrate.cover)
+
+site_data_wide %>%   ### Pivot wide to make table
+  kbl() %>%
+  kable_classic() %>%
+  kable_styling(full_width = FALSE)
+
+
+```
+
+
+```{r, fig.height=9, fig.width=14}
+site_data_long <- site_data_wide %>%
+  pivot_longer(cols = algal.cover:substrate.cover,                          
+               names_to = "Variable",                      
+               values_to = "Mean_Value")  
+view(site_data_long)
+
+ggplot(site_data_long, aes(x = name, y = Mean_Value, color = name)) +
+  geom_boxplot()+
+  facet_wrap(~ Variable, scales = "free") +  
+  labs(x = "Site Name",           
+       y = "Average cover value",
+       title = "Comparison of cover of different species by site") +
+  theme(legend.position = "none") + # Remove legend 
+theme_minimal() +                                           ## theme_minimal() to add customizations on top
+  theme(
+    axis.title = element_text(size = 15),
+    panel.background = element_rect(fill = "linen"),
+    plot.background = element_rect(fill = "white"),           ## Background saved as grey before so changed it to white
+    plot.title = element_text(size = 20),
+    plot.subtitle = element_text(size = 10)) ## Just having fun with all the color options. 
+
+```
+
+
