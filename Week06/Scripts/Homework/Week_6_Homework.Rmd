@@ -2,38 +2,42 @@
 title: "Week_6_Homework"
 author: "Kassandra Jensen"
 date: "2024-10-04"
-output: html_document
+output: 
+ html_document:
+    toc: TRUE
+    toc_float: TRUE
 ---
 
 ```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE)
+knitr::opts_chunk$set(echo = TRUE,
+                      warning = FALSE, 
+                      message = FALSE,
+                      fig.path = "../../Output/")
 ```
 
 ## Directions
-#### Take any of the data sheets you have already worked with in class and create at least one table and one figure in an Rmarkdown file.
-#### Create the most beautiful RMarkdown output you can in either an html, github doc, or pdf format. YOU MUST KNIT THE FILE
-#### Make sure you have headings with clear explanations of what you are doing.
-#### Practice using markdown formatting with bold, italics, and lists (use each of these at least once).
-#### Make sure your outputs and scripts are saved in the appropriate folders. Keep proper coding etiquette (figures need to be pub quality as usual and you need to comment your code).
+Take any of the data sheets you have already worked with in class and create at least one table and one figure in an Rmarkdown file.
+Create the most beautiful RMarkdown output you can in either an html, github doc, or pdf format. YOU MUST KNIT THE FILE
+Make sure you have headings with clear explanations of what you are doing.
+Practice using markdown formatting with bold, italics, and lists (use each of these at least once).
+Make sure your outputs and scripts are saved in the appropriate folders. Keep proper coding etiquette (figures need to be pub quality as usual and you need to comment your code).
 
+# Load Libraries
 ```{r}
 library(tidyverse)
 library(here)
 library(kableExtra)
 ```
-
+# Load Data
+#### View Data
+###### This data is from *Week 5* of class. 
 ```{r}
 site_data <- read_csv(here("Week05", "Data", "site.characteristics.data.csv"))
-
-head(site_data)
-tail(site_data)
-
-site_data_mean <- site_data %>%
-  group_by(name, parameter.measured) %>%
-  summarise(mean_values = mean(values, na.rm = TRUE)) 
-
+view(site_data)
 ```
 
+# Average Values
+#### Average values of **Algal Cover**, **CCA Cover**, **Coral Cover**, and **Substrate Cover**
 ```{r}
 site_data_wide <- site_data %>%
   group_by(name, parameter.measured) %>%
@@ -47,31 +51,44 @@ site_data_wide %>%   ### Pivot wide to make table
   kable_classic() %>%
   kable_styling(full_width = FALSE)
 
-
 ```
+# Visual plot
+```{r, fig.height=9, fig.width=14}   
+## Change dimensions for document
 
-
-```{r, fig.height=9, fig.width=14}
-site_data_long <- site_data_wide %>%
-  pivot_longer(cols = algal.cover:substrate.cover,                          
-               names_to = "Variable",                      
-               values_to = "Mean_Value")  
+site_data_long <- site_data_wide %>%                                ## Call and rename data
+  pivot_longer(cols = algal.cover:substrate.cover,                  ## Revert to long form ## Only use certain variables
+               names_to = "Variable",                               ## Rename column
+               values_to = "Mean_Value")                            ## Rename column
 view(site_data_long)
 
-ggplot(site_data_long, aes(x = name, y = Mean_Value, color = name)) +
-  geom_boxplot()+
-  facet_wrap(~ Variable, scales = "free") +  
-  labs(x = "Site Name",           
+## Make plot
+ggplot(site_data_long, aes(x = name,                                ## Choose X and Y variables
+                           y = Mean_Value, 
+                           color = name,                            ## Color different sites
+                           fill = name)) +                          ## Fill in with same colors
+  geom_col() +                                                      ## Use geom_col to visualize cover
+  facet_wrap(~ Variable,                                            ## Facet by each variable,
+             scales = "free",                                       ## Each plot has different scale that will better showcase results
+             labeller = as_labeller(c(                              ## Change individual plot labels
+               "algal.cover" = "Algal Cover",
+               "CCA.cover" = "CCA Cover",
+               "coral.cover" = "Coral Cover",
+               "substrate.cover" = "Substrate Cover"
+             ))) +  
+  labs(x = "Site Name",                                             ## Change titles
        y = "Average cover value",
-       title = "Comparison of cover of different species by site") +
-  theme(legend.position = "none") + # Remove legend 
-theme_minimal() +                                           ## theme_minimal() to add customizations on top
-  theme(
+       title = "Comparison of cover of different species by site") +  
+  scale_color_discrete(guide = "none") +                            ## Remove color legend
+  scale_fill_discrete(guide = "none") +                             ## Remove fill legend
+  theme_minimal() +                                                 ## Minimal theme
+  theme(                                                            ## Change sizes and colors
     axis.title = element_text(size = 15),
     panel.background = element_rect(fill = "linen"),
-    plot.background = element_rect(fill = "white"),           ## Background saved as grey before so changed it to white
+    plot.background = element_rect(fill = "white"),          
     plot.title = element_text(size = 20),
-    plot.subtitle = element_text(size = 10)) ## Just having fun with all the color options. 
+    plot.subtitle = element_text(size = 10)
+  )
 
 ```
 
