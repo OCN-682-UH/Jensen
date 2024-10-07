@@ -1710,8 +1710,8 @@ border-radius: 0px;
 </div>
 
 
-<div id="directions" class="section level2">
-<h2>Directions</h2>
+<div id="directions" class="section level1">
+<h1>Directions</h1>
 <p>Take any of the data sheets you have already worked with in class and
 create at least one table and one figure in an Rmarkdown file. Create
 the most beautiful RMarkdown output you can in either an html, github
@@ -1722,29 +1722,57 @@ once). Make sure your outputs and scripts are saved in the appropriate
 folders. Keep proper coding etiquette (figures need to be pub quality as
 usual and you need to comment your code).</p>
 </div>
-<div id="load-libraries" class="section level1">
-<h1>Load Libraries</h1>
+<div id="description" class="section level1">
+<h1>Description</h1>
+<div id="this-document-will-be-used-to-showcase-environmental-data-collected-from-moorea." class="section level4">
+<h4>This document will be used to showcase environmental data collected
+from Mo’orea.</h4>
+</div>
+<div id="the-following-will-include" class="section level4">
+<h4>The following will include:</h4>
+<ul>
+<li>A glimpse of the raw data</li>
+<li>A table showcasing nulmerical values of selected variables</li>
+<li>A graph representing the values of selected variables for further
+comparison</li>
+</ul>
+</div>
+</div>
+<div id="libraries-used" class="section level1">
+<h1>Libraries used</h1>
 <pre class="r"><code>library(tidyverse)
 library(here)
 library(kableExtra)</code></pre>
 </div>
-<div id="load-data" class="section level1">
-<h1>Load Data</h1>
+<div id="data" class="section level1">
+<h1>Data</h1>
 <div id="view-data" class="section level4">
 <h4>View Data</h4>
 <div id="this-data-is-from-week-5-of-class." class="section level6">
 <h6>This data is from <em>Week 5</em> of class.</h6>
 <pre class="r"><code>site_data &lt;- read_csv(here(&quot;Week05&quot;, &quot;Data&quot;, &quot;site.characteristics.data.csv&quot;))
-view(site_data)</code></pre>
+view(site_data)
+glimpse(site_data)</code></pre>
+<pre><code>## Rows: 78
+## Columns: 5
+## $ name               &lt;chr&gt; &quot;Anemone Heaven&quot;, &quot;Hilton High&quot;, &quot;Public Beach&quot;, &quot;M…
+## $ site.letter        &lt;chr&gt; &quot;F&quot;, &quot;C&quot;, &quot;B&quot;, &quot;E&quot;, &quot;D&quot;, &quot;A&quot;, &quot;F&quot;, &quot;C&quot;, &quot;B&quot;, &quot;E&quot;, &quot;…
+## $ site.block         &lt;dbl&gt; 1, 2, 3, 1, 2, 3, 1, 2, 3, 1, 2, 3, 1, 2, 3, 1, 2, …
+## $ parameter.measured &lt;chr&gt; &quot;light&quot;, &quot;light&quot;, &quot;light&quot;, &quot;light&quot;, &quot;light&quot;, &quot;light…
+## $ values             &lt;dbl&gt; 1674.241, 1193.230, 2647.890, 1533.245, 2114.013, 2…</code></pre>
 </div>
 </div>
 </div>
 <div id="average-values" class="section level1">
 <h1>Average Values</h1>
-<div id="average-values-of-algal-cover-cca-cover-coral-cover-and-substrate-cover" class="section level4">
-<h4>Average values of <strong>Algal Cover</strong>, <strong>CCA
-Cover</strong>, <strong>Coral Cover</strong>, and <strong>Substrate
-Cover</strong></h4>
+<div id="average-values-of" class="section level4">
+<h4>Average values of</h4>
+<ol style="list-style-type: decimal">
+<li><strong>Algal Cover</strong></li>
+<li><strong>CCA Cover</strong> (crustose coralline algae cover)</li>
+<li><strong>Coral Cover</strong></li>
+<li><strong>Substrate Cover</strong></li>
+</ol>
 <pre class="r"><code>site_data_wide &lt;- site_data %&gt;%
   group_by(name, parameter.measured) %&gt;%
   summarise(mean_values = mean(values, na.rm = TRUE)) %&gt;%

@@ -15,29 +15,43 @@ knitr::opts_chunk$set(echo = TRUE,
                       fig.path = "../../Output/")
 ```
 
-## Directions
+# Directions
 Take any of the data sheets you have already worked with in class and create at least one table and one figure in an Rmarkdown file.
 Create the most beautiful RMarkdown output you can in either an html, github doc, or pdf format. YOU MUST KNIT THE FILE
 Make sure you have headings with clear explanations of what you are doing.
 Practice using markdown formatting with bold, italics, and lists (use each of these at least once).
 Make sure your outputs and scripts are saved in the appropriate folders. Keep proper coding etiquette (figures need to be pub quality as usual and you need to comment your code).
 
-# Load Libraries
+# Description
+#### This document will be used to showcase environmental data collected from Mo'orea.
+#### The following will include:
+
+* A glimpse of the raw data 
+* A table showcasing nulmerical values of selected variables
+* A graph representing the values of selected variables for further comparison
+
+
+# Libraries used
 ```{r}
 library(tidyverse)
 library(here)
 library(kableExtra)
 ```
-# Load Data
+# Data
 #### View Data
 ###### This data is from *Week 5* of class. 
 ```{r}
 site_data <- read_csv(here("Week05", "Data", "site.characteristics.data.csv"))
 view(site_data)
+glimpse(site_data)
 ```
 
 # Average Values
-#### Average values of **Algal Cover**, **CCA Cover**, **Coral Cover**, and **Substrate Cover**
+#### Average values of 
+ 1. **Algal Cover**
+ 2. **CCA Cover** (crustose coralline algae cover)
+ 3. **Coral Cover**
+ 4. **Substrate Cover**
 ```{r}
 site_data_wide <- site_data %>%
   group_by(name, parameter.measured) %>%
