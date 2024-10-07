@@ -1751,8 +1751,8 @@ library(kableExtra)</code></pre>
 <div id="this-data-is-from-week-5-of-class." class="section level6">
 <h6>This data is from <em>Week 5</em> of class.</h6>
 <pre class="r"><code>site_data &lt;- read_csv(here(&quot;Week05&quot;, &quot;Data&quot;, &quot;site.characteristics.data.csv&quot;))
-view(site_data)
-glimpse(site_data)</code></pre>
+view(site_data)                      
+glimpse(site_data)                  </code></pre>
 <pre><code>## Rows: 78
 ## Columns: 5
 ## $ name               &lt;chr&gt; &quot;Anemone Heaven&quot;, &quot;Hilton High&quot;, &quot;Public Beach&quot;, &quot;M…
@@ -1773,17 +1773,18 @@ glimpse(site_data)</code></pre>
 <li><strong>Coral Cover</strong></li>
 <li><strong>Substrate Cover</strong></li>
 </ol>
-<pre class="r"><code>site_data_wide &lt;- site_data %&gt;%
-  group_by(name, parameter.measured) %&gt;%
-  summarise(mean_values = mean(values, na.rm = TRUE)) %&gt;%
-  pivot_wider(names_from = parameter.measured,
-              values_from = mean_values) %&gt;%
- select(algal.cover, CCA.cover, coral.cover, substrate.cover)
+<pre class="r"><code>site_data_wide &lt;- site_data %&gt;%                                     ## Call data
+  group_by(name, parameter.measured) %&gt;%                            ## Select certain columns
+  summarise(mean_values = mean(values, na.rm = TRUE)) %&gt;%           ## Get mean values
+  pivot_wider(names_from = parameter.measured,                      ## Pivot wide to make table
+              values_from = mean_values) %&gt;%                        ## Get information needed from these columns
+ select(algal.cover, CCA.cover, coral.cover, substrate.cover)       ## Select specific variables to look at
 
-site_data_wide %&gt;%   ### Pivot wide to make table
-  kbl() %&gt;%
-  kable_classic() %&gt;%
-  kable_styling(full_width = FALSE)</code></pre>
+## Make table
+site_data_wide %&gt;%                                                  ## Call data
+  kbl() %&gt;%                                                         ## Use kbl function to make table
+  kable_classic() %&gt;%                                               ## Use classic theme
+  kable_styling(full_width = FALSE)                                 ## Table will only take up as much space as necessary, won&#39;t be stretched</code></pre>
 <table class=" lightable-classic table" style="font-family: &quot;Arial Narrow&quot;, &quot;Source Sans Pro&quot;, sans-serif; margin-left: auto; margin-right: auto; width: auto !important; margin-left: auto; margin-right: auto;">
 <thead>
 <tr>
@@ -1919,9 +1920,8 @@ site_data_long &lt;- site_data_wide %&gt;%                                ## Cal
   pivot_longer(cols = algal.cover:substrate.cover,                  ## Revert to long form ## Only use certain variables
                names_to = &quot;Variable&quot;,                               ## Rename column
                values_to = &quot;Mean_Value&quot;)                            ## Rename column
-view(site_data_long)
-
-## Make plot
+view(site_data_long)</code></pre>
+<pre class="r"><code>## Make plot
 ggplot(site_data_long, aes(x = name,                                ## Choose X and Y variables
                            y = Mean_Value, 
                            color = name,                            ## Color different sites

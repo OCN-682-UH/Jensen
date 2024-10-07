@@ -12,7 +12,7 @@ output:
 knitr::opts_chunk$set(echo = TRUE,
                       warning = FALSE, 
                       message = FALSE,
-                      fig.path = "../../Output/") 
+                      fig.path = "../../Output/Homework/") 
 ```
 
 # Directions
@@ -42,8 +42,8 @@ library(kableExtra)
 ###### This data is from *Week 5* of class. 
 ```{r}
 site_data <- read_csv(here("Week05", "Data", "site.characteristics.data.csv"))
-view(site_data)
-glimpse(site_data)
+view(site_data)                      
+glimpse(site_data)                  
 ```
 
 # Average Values
@@ -53,21 +53,22 @@ glimpse(site_data)
  3. **Coral Cover**
  4. **Substrate Cover**
 ```{r}
-site_data_wide <- site_data %>%
-  group_by(name, parameter.measured) %>%
-  summarise(mean_values = mean(values, na.rm = TRUE)) %>%
-  pivot_wider(names_from = parameter.measured,
-              values_from = mean_values) %>%
- select(algal.cover, CCA.cover, coral.cover, substrate.cover)
+site_data_wide <- site_data %>%                                     ## Call data
+  group_by(name, parameter.measured) %>%                            ## Select certain columns
+  summarise(mean_values = mean(values, na.rm = TRUE)) %>%           ## Get mean values
+  pivot_wider(names_from = parameter.measured,                      ## Pivot wide to make table
+              values_from = mean_values) %>%                        ## Get information needed from these columns
+ select(algal.cover, CCA.cover, coral.cover, substrate.cover)       ## Select specific variables to look at
 
-site_data_wide %>%   ### Pivot wide to make table
-  kbl() %>%
-  kable_classic() %>%
-  kable_styling(full_width = FALSE)
+## Make table
+site_data_wide %>%                                                  ## Call data
+  kbl() %>%                                                         ## Use kbl function to make table
+  kable_classic() %>%                                               ## Use classic theme
+  kable_styling(full_width = FALSE)                                 ## Table will only take up as much space as necessary, won't be stretched
 
 ```
 # Visual plot
-```{r, fig.height=9, fig.width=14}   
+```{r}   
 ## Change dimensions for document
 
 site_data_long <- site_data_wide %>%                                ## Call and rename data
@@ -75,7 +76,9 @@ site_data_long <- site_data_wide %>%                                ## Call and 
                names_to = "Variable",                               ## Rename column
                values_to = "Mean_Value")                            ## Rename column
 view(site_data_long)
+```
 
+```{r graph_homework_06, fig.height=9, fig.width=14}
 ## Make plot
 ggplot(site_data_long, aes(x = name,                                ## Choose X and Y variables
                            y = Mean_Value, 
