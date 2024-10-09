@@ -137,4 +137,77 @@ ggplot(mtcars) +
 
 ```
 
+```{r}
+### getting api
+library(lubridate)
+library(ggplot2)
+library(dplyr)
+library(data.table)
+library(ggrepel)
+library(tidyverse)
+
+
+#A) Download the main crime incident dataset
+
+incidents= read.csv('https://raw.githubusercontent.com/lgellis/MiscTutorial/master/ggmap/i2Sample.csv', stringsAsFactors = FALSE)
+
+#B) Download the extra dataset with the most dangerous Seattle cities as per:
+
+# https://housely.com/dangerous-neighborhoods-seattle/
+
+n <- read.csv('https://raw.githubusercontent.com/lgellis/MiscTutorial/master/ggmap/n.csv', stringsAsFactors = FALSE)
+
+# Look at the data sets
+
+dim(incidents)
+
+head(incidents)
+
+attach(incidents)
+
+dim(n)
+
+head(n)
+
+attach(n)
+
+# Create some color variables for graphing later
+
+col1 = "#011f4b"
+
+col2 = "#6497b1"
+
+col3 = "#b3cde0"
+
+col4 = "#CC0000"
+
+#add year to the incidents data frame
+incidents$ymd <-mdy_hms(Event.Clearance.Date)
+incidents$year <- year(incidents$ymd)
+
+#Create a more manageable data frame with only 2017 and 2018 data
+i2 <- incidents %>% 
+  filter(year>=2017 & year<=2018)
+
+#Only include complete cases
+i2[complete.cases(i2), ]
+
+#create a display label to the n data frame (dangerous neighbourhoods)
+n$label <-paste(Rank, Location, sep="-")
+```
+```{r}
+
+
+#Get the latest Install
+if(!requireNamespace("devtools")) install.packages("devtools")
+devtools::install_github("dkahle/ggmap", ref = "tidyup", force=TRUE)
+
+#Load the library
+library("ggmap")
+
+#Set your API Key
+ggmap::register_google(key = "AIzaSyAYy-dqjsUwnvE59TStdRRQQv6hYqrdmzw")
+
+```
+
 
