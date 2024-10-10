@@ -61,7 +61,7 @@ ggplot(Cond_Depth_Data_long,
     axis.title = element_text(size = 15),                           ## Change font size 
     panel.background = element_rect(fill = "linen"),                ## Change panel background color
     plot.background = element_rect(fill = "white"),                 ## Change plot background color
-    plot.title = element_text(size = 20),                           ## Change font size
+    plot.title = element_text(size = ),                           ## Change font size
     plot.subtitle = element_text(size = 10),                        ## Change font size
     legend.position = "none"                                        ## Legend label not necessary
   )
