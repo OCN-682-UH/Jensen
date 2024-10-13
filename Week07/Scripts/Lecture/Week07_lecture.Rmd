@@ -206,8 +206,6 @@ devtools::install_github("dkahle/ggmap", ref = "tidyup", force=TRUE)
 library("ggmap")
 
 #Set your API Key
-
-
 ```
 
 
