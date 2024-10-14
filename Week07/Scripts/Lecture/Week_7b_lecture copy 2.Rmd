@@ -1,0 +1,92 @@
+---
+title: "Week_7b_lecture"
+author: "Kassandra Jensen"
+date: "2024-10-10"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r}
+library(ggmap)
+library(tidyverse)
+library(here)
+library(ggspatial)
+
+
+## api key is registered- good until you update R or use a new computer
+## do not put into github! just put in console
+
+ChemData<-read_csv(here("Week07","Data","chemicaldata_maunalua.csv"))
+glimpse(ChemData)
+
+Oahu <- get_map("Oahu")
+
+ggmap(Oahu)
+
+## This is essentially a screen shot from google maps
+
+#Make a data frame of lon and lat coordinates
+WP<-data.frame(lon = -157.7621, lat = 21.27427) # coordinates for Wailupe
+# Get base layer
+Map1<-get_map(WP)
+# plot it
+ggmap(Map1)
+
+# Zoom in 
+# Up to you and what you want to visualize
+# goes 3- 20 (3 is like who continent, 20 is a single building)
+Map1<-get_map(WP,zoom = 17)
+ggmap(Map1)
+
+## satellite better for our purposes
+Map1<-get_map(WP,zoom = 17, maptype = "satellite")
+ggmap(Map1)
+
+## lots of other map options you can use -- stadia has a bunch too
+
+## use ggmap base layer in any ggplot
+Map1<-get_map(WP,zoom = 17, maptype = "satellite") 
+ggmap(Map1)+
+  geom_point(data = ChemData,
+             aes(x = Long, y = Lat, color = Salinity),
+             size = 4) +
+  scale_color_viridis_c()
+
+## add scale bar
+ggmap(Map1)+
+  geom_point(data = ChemData, 
+             aes(x = Long, y = Lat, color = Salinity), 
+             size = 4) + 
+  scale_color_viridis_c()+
+  annotation_scale( bar_cols = c("yellow", "white"),
+                    location = "bl")+ # put the bar on the bottom left and make the colors yellow and white
+  annotation_north_arrow(location = "tl")+ # add a north arrow
+  coord_sf(crs = 4326) # for the scale bar to work it needs to be in this coordinate system - this is a typical coordinate reference system for a GPS (WGS84)
+```
+
+```{r}
+## Don't know the exact lat and long?
+
+##Use geocode() to get exact locations that you can then use in the maps.
+
+geocode("the white house")
+
+geocode("University of Hawaii at Manoa")
+
+```
+```{r}
+## cool r package
+
+library(emojifont)
+search_emoji('smile')
+
+ggplot() + 
+  geom_emoji('smile_cat', 
+             x=1:5, y=1:5, 
+             size=10)
+```
+
+

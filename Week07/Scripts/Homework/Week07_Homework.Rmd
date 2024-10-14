@@ -51,11 +51,9 @@ view(cats_selected)
 
 
 ```{r}
-UK_map <- get_map("UK")
-ggmap(UK_map)
-
 ## Need to manually set location because UK map was too general. Pulled point from one of the cats.
 UK_map <- get_map(location = c(lon = -5.081133, lat = 50.14673), zoom = 15, maptype = "hybrid")
+ggmap(UK_map)
 
 ggmap(UK_map) +
   geom_point(data = cats_selected,
