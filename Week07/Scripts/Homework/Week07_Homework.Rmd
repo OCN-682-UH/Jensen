@@ -96,6 +96,6 @@ ggmap(UK_map) +
        subtitle = "A Journey Through the Eyes of Coastal Cats") +
   theme_minimal()
 
-ggsave(here("Week07","Output","Homework", "Homework07_CatMap.pdf")) ## Save plot
+ggsave(here("Week07","Output","Homework", "Homework07_CatMap.png")) ## Save plot
 ```
 
