@@ -2,17 +2,23 @@
 title: "Week07_Homework"
 author: "Kassandra Jensen"
 date: "2024-10-13"
-output: html_document
+output: 
+   html_document:
+    toc: TRUE
+    toc_float: TRUE
 ---
 
 ```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE)
+knitr::opts_chunk$set(echo = TRUE,
+                      warning = FALSE, 
+                      message = FALSE)
+
 ```
 
 ## Directions
 You need to make a map using RMarkdown with one of the following datasets from past Tidy Tuesdays. Make sure, as usual, that you scripts and output are saved appropriately.
 
-Plastic pollution, Cats on the move!, Where is Bigfoot!, Meteorites
+I will be using the Tidy Tuesday data set: Cats on the move!
 
 # Load Libraries
 ```{r}
@@ -24,6 +30,8 @@ library(ggspatial)
 ```
 
 # Load data: Cats on the move!
+The data and code below were provided [here.](https://github.com/rfordatascience/tidytuesday/blob/master/data/2023/2023-01-31/readme.md)
+
 ```{r}
 tuesdata <- tidytuesdayR::tt_load('2023-01-31')
 tuesdata <- tidytuesdayR::tt_load(2023, week = 5)
@@ -33,42 +41,61 @@ cats_uk_reference <- tuesdata$cats_uk_reference
 
 glimpse(cats_uk)
 glimpse(cats_uk_reference)
-
-cats_uk_full <- full_join(cats_uk, cats_uk_reference, by = "tag_id")
-
-view(cats_uk_full)
 ```
 
+# Join data
+I wanted to join the data to have all the information in one place, especially the actual cat name as well as the tag ID. 
 ```{r}
+## Join both data sets by the column tag_id.
+cats_uk_full <- full_join(cats_uk, cats_uk_reference, by = "tag_id")
+
+## View to make sure it was joined properly.
+view(cats_uk_full)  
+```
+
+# Filter data
+I filtered the data so only a two cats would be shown. This way we can track their movements more closely, rather than looking across the entire United Kingdom.
+```{r}
+## Select cats Maverick and Bear.
 selected_cats <- c("Maverick", "Bear")
 
-# Filter the dataset to only include the selected cats
+# Filter the dataset to only include the selected cats.
 cats_selected <- cats_uk_full %>% 
   filter(animal_id %in% selected_cats)
 
+## View to make sure only the specified cats were chosen.
 view(cats_selected)
 ```
 
-
+# Make Map
+## Get map location
 ```{r}
 ## Need to manually set location because UK map was too general. Pulled point from one of the cats.
 UK_map <- get_map(location = c(lon = -5.081133, lat = 50.14673), zoom = 15, maptype = "hybrid")
 ggmap(UK_map)
+```
 
+## Plot Maverick and Bear on the map. 
+```{r}
 ggmap(UK_map) +
-  geom_point(data = cats_selected,
-             aes(x = location_long, 
-                 y = location_lat, 
-                 color = as.factor(animal_id)),
-             size = 2) +
-  geom_path(data = cats_selected %>% arrange(animal_id, timestamp),
-            aes(x = location_long,
-                y = location_lat, 
-                group = animal_id, 
-                color = as.factor(animal_id)),
-            size = 0.5, lineend = "round") +
-  labs(color = "Cat ID") +
+  geom_point(data = cats_selected,                     ## select data set for points
+             aes(x = location_long,                    ## longitude
+                 y = location_lat,                     ## latitude
+                 color = as.factor(animal_id)),        ## change color by each cat
+             size = 2) +                               ## change to best looking size
+  geom_path(data = cats_selected %>% arrange(animal_id, timestamp),    ## group by cat, connect in order of cat movement 
+            aes(x = location_long,                     ## longitude
+                y = location_lat,                      ## latitude
+                group = animal_id,                     ## group by each cat
+                color = as.factor(animal_id)),         ## color by each cat
+            size = 0.5, lineend = "round") +           ## fix line aesthetics
+  labs(x = "Longitude",                                ## fix labels and add a cheeky title
+       y= "Latitude",
+       color = "Cat Names",
+       title="Whiskers in the Wild: Tracking Two Cats at Gyllyngvase Beach",
+       subtitle = "A Journey Through the Eyes of Coastal Cats") +
   theme_minimal()
 
+ggsave(here("Week07","Output","Homework", "Homework07_CatMap.pdf")) ## Save plot
 ```
 
