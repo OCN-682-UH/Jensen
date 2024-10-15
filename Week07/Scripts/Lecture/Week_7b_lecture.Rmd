@@ -2,23 +2,28 @@
 title: "Week_7b_lecture"
 author: "Kassandra Jensen"
 date: "2024-10-10"
-output: html_document
+output: 
+  html_document:
+    toc: TRUE
+    toc_float: TRUE
+    theme: darkly
 ---
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
 ```
-
+# Load Libraries
 ```{r}
 library(ggmap)
 library(tidyverse)
 library(here)
 library(ggspatial)
 
-
 ## api key is registered- good until you update R or use a new computer
 ## do not put into github! just put in console
-
+```
+## Load 
+```{r}
 ChemData<-read_csv(here("Week07","Data","chemicaldata_maunalua.csv"))
 glimpse(ChemData)
 
