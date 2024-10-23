@@ -9,8 +9,58 @@ output: html_document
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
+Directions: Use any dataset you would like and make two useful functions. One that is a plot and one that is not. Turn in your functions using RMarkdown with at least 2 examples per function showing its flexibility. Due, as always, at 1pm on Tuesday.
+
 # Load Libraries
 ```{r}
+library(tidytuesdayR)
+library(ggmap)
 library(tidyverse)
+library(here)
+library(ggspatial)
+library(lme4)
+```
+
+## Use Chess Data
+```{r}
+tuesdata <- tidytuesdayR::tt_load('2024-10-01')
+
+chess <- tuesdata$chess
+
+view(chess)
+colnames(chess)
+
+```
+
+# Function 1
+## Linear Model Function
+This allows you to change the response and predictor variables. 
+```{r}
+model_function <- function(response, predictors){                   ##add variables that will be used in function
+  formula <- as.formula(paste(response, "~",                        ## use paste to take multiple variables but separate by a character 
+                              paste(predictors, collapse = " + "))) ## used collapse to make it one line/ string 
+  model <- lm(formula, data = chess)                                ## always use lm and data = chess 
+}
+
+## Example 1:
+model_summary <- model_function("white_rating", c("turns", "time_increment"))     ## model function with response, then two predictors
+model_summary
+
+## Example 2:
+model_summary2 <- model_function("white_rating", c("winner", "victory_status"))   ## model function with response and one predictor
+model_summary2
+```
+
+# Function 2
+## Plot function
+```{r}
+## unsure what to doo... could do a general one where you plug in the type of ggplot you want...
+ggplot(chess, aes(x = winner, y = turns)) +
+  geom_col() +
+  labs(title = "Distribution of Game Turns",
+       x = "Turns",
+       y = "Count") +
+  theme_minimal()
+
 ```
 
