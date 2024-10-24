@@ -22,45 +22,66 @@ library(lme4)
 ```
 
 ## Use Chess Data
+This data was obtained by looking through the tidy tuesday repository located [here](https://github.com/rfordatascience/tidytuesday).
+The specific folder containing this data can be found [here](https://github.com/rfordatascience/tidytuesday/tree/master/data/2024/2024-10-01).
 ```{r}
 tuesdata <- tidytuesdayR::tt_load('2024-10-01')
 
 chess <- tuesdata$chess
-
-view(chess)
 colnames(chess)
-
+glimpse(chess)
+view(chess)
 ```
 
 # Function 1
 ## Linear Model Function
 This allows you to change the response and predictor variables. 
+Function is based off the following linear model:
+    model_name <- glm(response ~ predictor 1 + predictor 2,
+                      data = data_name,
+                      family = "binomial")
 ```{r}
+## First we need to convert winner into a binary so it's more of a probability outcome of each color winning because you can't have a 
+## catergorical variable for a response in a glm. 
+
+chess$winner_binary <- ifelse(chess$winner == "white", 1, 0)       ## use if else to say "IF white, then value = 1, or ELSE value = 0"
+
+## Make function for model to predict outcome
+
 model_function <- function(response, predictors){                   ##add variables that will be used in function
   formula <- as.formula(paste(response, "~",                        ## use paste to take multiple variables but separate by a character 
                               paste(predictors, collapse = " + "))) ## used collapse to make it one line/ string 
-  model <- lm(formula, data = chess)                                ## always use lm and data = chess 
+  model <- glm(formula, data = chess,                               ## always use glm, data = chess,
+                      family = "binomial")                          ## always use family= binomial because we are using win and loss as response
 }
 
+
 ## Example 1:
-model_summary <- model_function("white_rating", c("turns", "time_increment"))     ## model function with response, then two predictors
+model_summary <- model_function("winner_binary", c("turns", "victory_status"))     ## model function with response, then two predictors
 model_summary
 
 ## Example 2:
-model_summary2 <- model_function("white_rating", c("winner", "victory_status"))   ## model function with response and one predictor
+model_summary2 <- model_function("winner_binary", c("white_rating"))               ## model function with response and one predictor
 model_summary2
 ```
 
 # Function 2
 ## Plot function
+We can use this function to showcase the results from the models from function 1.
 ```{r}
-## unsure what to doo... could do a general one where you plug in the type of ggplot you want...
-ggplot(chess, aes(x = winner, y = turns)) +
-  geom_col() +
-  labs(title = "Distribution of Game Turns",
-       x = "Turns",
-       y = "Count") +
-  theme_minimal()
+function2 <-function(data = chess, x, y, lines=TRUE ){     ## variables used in function
+ggplot(data, aes(x = {{x}}, y = {{y}}))+                   ## formula of function, x and y can be interchanged
+ geom_boxplot() +                                          ## using boxplot to showcase results
+  theme_bw()                                               ## basic black and white theme
+}
 
+## I did not use the if, else statement here like we did in class because these are simple graphs
+
+## Example 1:
+function2(x = winner, y = white_rating) 
+
+## Example 2:
+function2(x = winner, y = turns)
 ```
+
 
