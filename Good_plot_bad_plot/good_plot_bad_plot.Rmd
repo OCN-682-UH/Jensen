@@ -1,0 +1,99 @@
+---
+title: "Good plot/ bad plot"
+author: "Kassandra Jensen"
+date: "2024-10-24"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Directions: Good plot Bad plot lab - competition
+Due October 29
+
+Your homework is to create two version of similar plots, using any dataset you choose. You must create the plots using ggplot2, post-processing with Adobe Illustrator or similar is not allowed. This homework is a contest, and the winner will win a prize to be disclosed.
+Please submit your homework by posting a markdown document containing the plots, the code you used to create them, and your discussion of the plot within the markdown doc to github. Data also needs to be submitted.
+The first plot should be as bad as possible. Your reading from Claus Wilke’s and Healy's textbook describe the many ways that a plot can become misleading, difficult to interpret, or or just plain ugly, and you should use all of the tools that you can. Please try to make me, a person who cares a great deal about high-quality data visualization, cry.
+You should explain in text all of the ways in which the bad plot is bad. Bullet points are fine, but clearly articulate each principle of data visualization that you have broken.
+The second plot should be based on the same or similar data to the first plot, but it should be good. Write briefly about why this is a successful plot.
+All plots must be made in ggplot2, with code visible in the Rmarkdown document.
+The data must be visible.
+The good plot and the bad plot should be based on the same, or similar, data.
+
+# Load libraries
+```{r}
+library(tidyverse)
+library(janitor)
+library(usmap)
+```
+
+# Load data:
+```{r}
+weather_forecasts <- readr::read_csv('https://raw.githubusercontent.com/rfordatascience/tidytuesday/master/data/2022/2022-12-20/weather_forecasts.csv')
+cities <- readr::read_csv('https://raw.githubusercontent.com/rfordatascience/tidytuesday/master/data/2022/2022-12-20/cities.csv')
+outlook_meanings <- readr::read_csv('https://raw.githubusercontent.com/rfordatascience/tidytuesday/master/data/2022/2022-12-20/outlook_meanings.csv')
+
+
+view(weather_forecasts)
+view(cities)
+view(outlook_meanings)
+
+
+colnames(weather_forecasts)
+```
+
+
+```{r}
+weather_forecasts_filtered <- weather_forecasts %>%
+  drop_na(forecast_temp) %>%
+  drop_na(observed_precip) %>%
+  mutate(temp_accuracy = abs(forecast_temp - observed_temp)) %>%
+  group_by(state)
+
+view(weather_forecasts_filtered)
+```
+
+# Bad plot ?
+```{r}
+ggplot(weather_forecasts_filtered, aes(x = date, y = state, fill = temp_accuracy)) +
+  geom_tile(color = "white") +
+  scale_fill_gradient(low = "green", high = "red", name = "Temperature Accuracy\n(Difference)") +
+  labs(title = "Temperature Forecast Accuracy",
+       x = "Date", y = "City") +
+  theme_minimal() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+```
+# Good plot: Map? 
+```{r}
+
+accuracy_by_state_filtered <- weather_forecasts_filtered %>%
+  filter(temp_accuracy >= 0 & temp_accuracy <= 50) %>%
+  group_by(state)
+
+
+ggplot(accuracy_by_state_filtered, aes(x = date, y = state, fill = temp_accuracy)) +
+  geom_tile(color = "white") +
+  scale_fill_gradient(low = "green", high = "red", name = "Temperature Accuracy\n(Difference)") +
+  labs(title = "Temperature Forecast Accuracy",
+       x = "Date", y = "City") +
+  theme_minimal() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+
+
+average_accuracy_by_state <- weather_forecasts_filtered %>%
+  filter(temp_accuracy >= 0 & temp_accuracy <= 50) %>%
+  group_by(state)
+            
+# Plot the map with average temperature accuracy
+plot_usmap(data = average_accuracy_by_state, values = "temp_accuracy", color = "white") +
+  scale_fill_gradient(low = "lightblue", high = "darkblue", name = "Avg Temp Accuracy") +
+  theme_minimal() +
+  labs(title = "Average Temperature Forecast Accuracy by State",
+       subtitle = "Accuracy range filtered to 0-50",
+       caption = "Data Source: weather_forecasts_filtered")
+```
+
+
+
+
