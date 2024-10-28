@@ -80,8 +80,15 @@ ggplot(data, aes(x = {{x}}, y = {{y}}))+                   ## formula of functio
 ## Example 1:
 function2(x = winner, y = white_rating) 
 
+ggsave("plot1_HW9.png", width = 8, height = 6)
+
 ## Example 2:
 function2(x = winner, y = turns)
+
+ggsave("plot2_HW9.png", width = 8, height = 6)
+
+
+
 ```
 
 
