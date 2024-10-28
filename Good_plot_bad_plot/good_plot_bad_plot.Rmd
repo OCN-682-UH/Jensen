@@ -31,31 +31,32 @@ library(usmap)
 # Load data:
 ```{r}
 weather_forecasts <- readr::read_csv('https://raw.githubusercontent.com/rfordatascience/tidytuesday/master/data/2022/2022-12-20/weather_forecasts.csv')
-cities <- readr::read_csv('https://raw.githubusercontent.com/rfordatascience/tidytuesday/master/data/2022/2022-12-20/cities.csv')
 outlook_meanings <- readr::read_csv('https://raw.githubusercontent.com/rfordatascience/tidytuesday/master/data/2022/2022-12-20/outlook_meanings.csv')
+## cities <- readr::read_csv('https://raw.githubusercontent.com/rfordatascience/tidytuesday/master/data/2022/2022-12-20/cities.csv') 
+## This is part of the data, but I opted to use usmap package to make my map instead. 
 
 
 view(weather_forecasts)
-view(cities)
 view(outlook_meanings)
-
-
-colnames(weather_forecasts)
 ```
 
-
+# Clean data
+I am only interested in full data, so I am dropping rows where forecast temperature and observed precipitation are NA. 
 ```{r}
-weather_forecasts_filtered <- weather_forecasts %>%
-  drop_na(forecast_temp) %>%
-  drop_na(observed_precip) %>%
-  mutate(temp_accuracy = abs(forecast_temp - observed_temp)) %>%
-  group_by(state)
+weather_forecasts_filtered <- weather_forecasts %>%               ## call data
+  drop_na(forecast_temp) %>%                                      ## drops NA's in forecast_temp column 
+  drop_na(observed_precip) %>%                                    ## drops NA's in observed_precip column 
+  mutate(temp_accuracy = abs(forecast_temp - observed_temp)) %>%  ## getting error of forecast by taking absolute value of forecast minus the observed
+  group_by(state)                                                 ## group by state to get accuracy
 
 view(weather_forecasts_filtered)
 ```
 
-# Bad plot ?
+# Bad plot
+Bad way to display a lot of data, scale is off and doesn't showcase differeces between states, ugly colors. 
 ```{r}
+## note to self: add some bad labels and photos maybe - if poss, put out of order or do photos to represent the state labels?
+
 ggplot(weather_forecasts_filtered, aes(x = date, y = state, fill = temp_accuracy)) +
   geom_tile(color = "white") +
   scale_fill_gradient(low = "green", high = "red", name = "Temperature Accuracy\n(Difference)") +
@@ -64,34 +65,23 @@ ggplot(weather_forecasts_filtered, aes(x = date, y = state, fill = temp_accuracy
   theme_minimal() +
   theme(axis.text.x = element_text(angle = 45, hjust = 1))
 ```
-# Good plot: Map? 
+# Good plot: Map
 ```{r}
 
 accuracy_by_state_filtered <- weather_forecasts_filtered %>%
-  filter(temp_accuracy >= 0 & temp_accuracy <= 50) %>%
+  filter(temp_accuracy >= 0 & temp_accuracy <= 55) %>%
   group_by(state)
 
-
-ggplot(accuracy_by_state_filtered, aes(x = date, y = state, fill = temp_accuracy)) +
-  geom_tile(color = "white") +
-  scale_fill_gradient(low = "green", high = "red", name = "Temperature Accuracy\n(Difference)") +
-  labs(title = "Temperature Forecast Accuracy",
-       x = "Date", y = "City") +
-  theme_minimal() +
-  theme(axis.text.x = element_text(angle = 45, hjust = 1))
-
-
-average_accuracy_by_state <- weather_forecasts_filtered %>%
-  filter(temp_accuracy >= 0 & temp_accuracy <= 50) %>%
-  group_by(state)
+view(accuracy_by_state_filtered)
             
 # Plot the map with average temperature accuracy
-plot_usmap(data = average_accuracy_by_state, values = "temp_accuracy", color = "white") +
+plot_usmap(data = accuracy_by_state_filtered, values = "temp_accuracy", color = "white") +
   scale_fill_gradient(low = "lightblue", high = "darkblue", name = "Avg Temp Accuracy") +
   theme_minimal() +
   labs(title = "Average Temperature Forecast Accuracy by State",
        subtitle = "Accuracy range filtered to 0-50",
        caption = "Data Source: weather_forecasts_filtered")
+
 ```
 
 
