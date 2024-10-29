@@ -78,11 +78,13 @@ view(weather_forecasts_HI_counts)
 ```
 
 ##### This is a bad plot because:
-- Missing key factors that make this data useful
+- Missing key variables that make this data useful, like time or location
 
-- Ugly colors
+- Color are distracting
 
-- Font size too big 
+- Title does not explain subject of plot approriately 
+
+- Font size too big in plot and is being cut off
 
 - Inappropriate use of emojis
 ```{r}
@@ -90,11 +92,11 @@ ggplot(weather_forecasts_HI_counts, aes(x = reorder(forecast_outlook, -count), y
   geom_tile(color = "magenta", size = 2) + 
   geom_text(aes(label = count), size = 23, color = "yellow", angle = 90) +  
   scale_fill_gradient(low = "limegreen", high = "red") +  
-  labs(title = expression(paste("😎 Weather Forecast Counts 🌧")),
+  labs(title = expression(paste("😎 How much weather?? 🌧")),
                                 x = "Forecast Outlook", y = "") +
   theme_void() + 
   theme(
-    plot.title = element_text(size = 20, face = "bold.italic", hjust = 0.5, color = "blue"),  
+    plot.title = element_text(size = 15, face = "bold.italic", hjust = 0.5, color = "blue"),  
     legend.position = "top", 
     panel.grid.major = element_line(size = 1, color = "cyan"),  
     panel.grid.minor = element_line(size = 1, color = "purple"),  
@@ -121,9 +123,15 @@ forecast_counts <- weather_forecasts_HI %>%        ## call data
 ##### This is a good plot because:
 - Clear title and subtitle showcasing location and what the plot is trying to represent
 
-- Aesthetics (font, colors, sizing) do not take away from the data being conveyed
+- Helpful x and y-axis
+
+- Appropriate font size 
+
+- Colors are not distracting and help convey denities
 
 - Heat map conveys meaningful densities overtime for comparisons
+
+- Data is sourced
 ```{r}
 ggplot(forecast_counts, aes(x = month_year,                             ## call data, put month_year as x axis
                             y = forecast_outlook)) +                    ## forecast as y- axis
@@ -131,6 +139,7 @@ ggplot(forecast_counts, aes(x = month_year,                             ## call 
   scale_fill_gradient(low = "lightblue", high = "darkblue") +           ## pretty colors
   labs(title = "Temporal Analysis of Weather Forecasts",                ## titles
        subtitle = "1.5 Years of Honolulu Weather Data",
+       caption = "Data source: https://github.com/rfordatascience/tidytuesday/tree/master/data/2022/2022-12-20",
        x = "Month-Year",
        y = "Forecast",
        fill = "Count") +

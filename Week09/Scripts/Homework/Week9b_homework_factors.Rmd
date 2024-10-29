@@ -1,0 +1,26 @@
+---
+title: "Week 9b Homework"
+author: "Kassandra Jensen"
+date: "2024-10-29"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Directions
+Working with intertidal data. Today you will need to use skills that you have learned in working with words to clean up some issues with the character data and use what you learned today to reorder your factors into orders that make sense. (Also the column headers could be better...). HINT: New package idea to fix this is using the janitor package.
+
+Your goal, as per usual, is to make a plot, any plot where one of the axes is a factor. Save everything in the appropriate folders.
+
+You have two possible files to play with in the data folder (you don't HAVE to use both): intertidal.csv and intertidal_latitude.csv (as well as a data dictionary)
+
+Importantly, if you decide to visualize anything by tide height it should go from low to mid to high tide on the plot and if you decide to visualize by site it should go in order of latitude (e.g. south to north or north to south).
+
+Homework due date extended for this assignment, due on Friday.
+
+```{r}
+
+```
+
