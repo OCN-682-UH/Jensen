@@ -24,7 +24,6 @@ Please submit your homework by posting a markdown document containing the plots,
 ```{r}
 library(tidyverse)
 library(here)
-library(glue)
 ```
 
 # Load data:
