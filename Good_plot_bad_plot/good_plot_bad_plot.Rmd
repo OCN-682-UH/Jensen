@@ -26,18 +26,22 @@ The good plot and the bad plot should be based on the same, or similar, data.
 library(tidyverse)
 library(janitor)
 library(usmap)
+library(wordcloud2)
 ```
 
 # Load data:
 ```{r}
 weather_forecasts <- readr::read_csv('https://raw.githubusercontent.com/rfordatascience/tidytuesday/master/data/2022/2022-12-20/weather_forecasts.csv')
 outlook_meanings <- readr::read_csv('https://raw.githubusercontent.com/rfordatascience/tidytuesday/master/data/2022/2022-12-20/outlook_meanings.csv')
-## cities <- readr::read_csv('https://raw.githubusercontent.com/rfordatascience/tidytuesday/master/data/2022/2022-12-20/cities.csv') 
+
+cities <- readr::read_csv('https://raw.githubusercontent.com/rfordatascience/tidytuesday/master/data/2022/2022-12-20/cities.csv') 
+
 ## This is part of the data, but I opted to use usmap package to make my map instead. 
 
 
 view(weather_forecasts)
 view(outlook_meanings)
+view(cities)
 ```
 
 # Clean data
@@ -46,7 +50,7 @@ I am only interested in full data, so I am dropping rows where forecast temperat
 weather_forecasts_filtered <- weather_forecasts %>%               ## call data
   drop_na(forecast_temp) %>%                                      ## drops NA's in forecast_temp column 
   drop_na(observed_precip) %>%                                    ## drops NA's in observed_precip column 
-  mutate(temp_accuracy = abs(forecast_temp - observed_temp)) %>%  ## getting error of forecast by taking absolute value of forecast minus the observed
+  mutate(temp_accuracy = abs(forecast_temp - observed_temp)) %>%## getting error of forecast by taking absolute value of forecast minus the observed
   group_by(state)                                                 ## group by state to get accuracy
 
 view(weather_forecasts_filtered)
@@ -67,23 +71,108 @@ ggplot(weather_forecasts_filtered, aes(x = date, y = state, fill = temp_accuracy
 ```
 # Good plot: Map
 ```{r}
+average_accuracy_by_state <- weather_forecasts_filtered %>%
+  filter(temp_accuracy >= 0 & temp_accuracy <= 55) %>%  # Exclude 0s
+  group_by(state) %>%
+  summarise(avg_temp_accuracy = mean(temp_accuracy, na.rm = TRUE))
 
-accuracy_by_state_filtered <- weather_forecasts_filtered %>%
-  filter(temp_accuracy >= 0 & temp_accuracy <= 55) %>%
-  group_by(state)
-
-view(accuracy_by_state_filtered)
             
-# Plot the map with average temperature accuracy
-plot_usmap(data = accuracy_by_state_filtered, values = "temp_accuracy", color = "white") +
-  scale_fill_gradient(low = "lightblue", high = "darkblue", name = "Avg Temp Accuracy") +
-  theme_minimal() +
-  labs(title = "Average Temperature Forecast Accuracy by State",
-       subtitle = "Accuracy range filtered to 0-50",
-       caption = "Data Source: weather_forecasts_filtered")
+plot_usmap(data = average_accuracy_by_state, values = "avg_temp_accuracy", color = "white") +
+  scale_fill_gradient(low = "lightgreen", high = "darkgreen", name = "Max Temp Accuracy") + 
+  theme_minimal() + 
+  labs(title = "Maximum Temperature Forecast Accuracy by State",
+       subtitle = "Accuracy range filtered to 0-55",
+       caption = "Data Source: weather_forecasts")
 
 ```
 
 
+# Part 2
+## Clean Data
+```{r}
+weather_forecasts_HI <- weather_forecasts%>%          ## Call data
+  filter (state == "HI") %>%                          ## Only Hawai‘i
+  drop_na(forecast_outlook)                           ## Get rid or NAs in column
 
+## Check for which types of forecast outlooks there are 
+unique(weather_forecasts_HI$forecast_outlook)
+
+## Rename everything to unabbreviated name 
+weather_forecasts_HI <- weather_forecasts_HI %>%                                                    
+  mutate(forecast_outlook = if_else(forecast_outlook == "SUNNY", "Sunny", forecast_outlook)) %>%
+  mutate(forecast_outlook = if_else(forecast_outlook == "MOCLDY", "Mostly Cloudy", forecast_outlook))%>%
+  mutate(forecast_outlook = if_else(forecast_outlook == "PTCLDY", "Partly Cloudy", forecast_outlook))%>%
+  mutate(forecast_outlook = if_else(forecast_outlook == "SHWRS", "Rain Showers", forecast_outlook))%>%
+  mutate(forecast_outlook = if_else(forecast_outlook == "CLOUDY", "Cloudy", forecast_outlook))%>%
+  mutate(forecast_outlook = if_else(forecast_outlook == "WINDY", "Windy", forecast_outlook))%>%
+  mutate(forecast_outlook = if_else(forecast_outlook == "TSTRMS", "Thunderstorms", forecast_outlook))
+
+## View to make sure it's what I want
+view(weather_forecasts_HI)
+```
+
+# Bad plot
+### Data manipulation
+```{r}
+outlook_counts <- weather_forecasts_HI %>%              ## call data
+  count(forecast_outlook) %>%                           ## count amount of times forecast_outlook categories come up
+  rename(word = forecast_outlook, freq = n)             ## rename columns to fit word cloud script, n is automatically created from count
+```
+
+### Plot
+```{r}
+wordcloud(words = outlook_counts$word,                                 ## call "words" aka forecast_outlook
+          freq = outlook_counts$freq,                                  ## call frequency
+          min.freq = 1,                                                ## Minimum frequency to include
+          max.words = 100,                                             ## This limits the total words displayed although we only have a few
+          random.order = FALSE,                                        ## arranges words by frequency
+          colors = c("skyblue", "gold", "lightgrey"))                   ## Colors for sunny, rainy, partly cloudy that represent the colors in nature
+```
+# Actual bad plot
+```{r}
+  
+forecast_counts <- weather_forecasts_HI %>%
+  count(forecast_outlook) %>%   # Count occurrences of each forecast outlook
+  rename(word = forecast_outlook, freq = n)  # R
+
+words <- data.frame(
+  word = c("Sunny", "Rainy", "Cloudy", "Partly Cloudy", "Snow", "Fog", "Windy"),
+  freq = c(100, 80, 10000, 40, 30, 20, 10)
+)
+
+ggplot(forecast_counts, aes(x = reorder(word, freq), y = 1, fill = freq)) +
+  geom_tile() +
+  geom_text(aes(label = word), size = 4, color = "white") +
+  scale_fill_gradient(low = "lightblue", high = "darkblue") +
+  labs(title = "Weather Forecast Outlook Counts", x = "Forecast Outlook", y = "") + 
+  theme_void() +  # Remove background, grid, and axes
+  theme(legend.position = "none")  # Remove legend
+
+```
+# Good plot
+### Data manipulation
+```{r}
+weather_forecasts_HI <- weather_forecasts_HI %>%   ## call data
+  mutate(month_year = floor_date(date, "month"))   ## round data to nearest month 
+
+forecast_counts <- weather_forecasts_HI %>%        ## call data
+  group_by(month_year, forecast_outlook) %>%       ## group by date and forecast because that's all we care about
+  summarise(count = n()) %>%                       ## n() counts the unique observations of what I put in groupby() 
+  ungroup()  
+
+```
+
+### Plot
+```{r}
+ggplot(forecast_counts, aes(x = month_year,                             ## call data, put month_year as x axis
+                            y = forecast_outlook)) +                    ## forecast as y- axis
+  geom_tile(aes(fill = count), color = "white") +                       ## use geom_tile for heat map
+  scale_fill_gradient(low = "lightblue", high = "darkblue") +           ## pretty colors
+  labs(title = "Frequency of Forecast Outlooks Overtime",              ## titles
+       x = "Month-Year",
+       y = "Forecast Outlook",
+       fill = "Count") +
+  theme_minimal() +                                                     ## minimal theme
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+```
 
