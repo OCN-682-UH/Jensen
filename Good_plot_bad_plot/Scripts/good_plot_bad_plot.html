@@ -1513,7 +1513,7 @@ github. Data also needs to be submitted.</p>
 <pre><code>## here() starts at /Users/kassandrajensen/MBIO612/MBIO612/Repositories/Jensen</code></pre>
 </div>
 <div id="load-data" class="section level1">
-<h1>Load data:</h1>
+<h1>Load data</h1>
 <p>The data for this assignment came from the tidy tuesday posted on
 12/19/2022. A link to the repository can be found <a href="https://github.com/rfordatascience/tidytuesday/tree/master/data/2022/2022-12-20">here</a>.</p>
 <p>There are three separate data sheets that were downloaded from the
@@ -1539,10 +1539,25 @@ United States over a period of 16 months, from January
 ## 
 ## ℹ Use `spec()` to retrieve the full column specification for this data.
 ## ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.</code></pre>
-<pre class="r"><code>view(weather_forecasts)
-view(outlook_meanings)
-
-## Saved data and uploaded to repository - do not need to keep saving 
+<pre class="r"><code>glimpse(weather_forecasts)</code></pre>
+<pre><code>## Rows: 651,968
+## Columns: 10
+## $ date                  &lt;date&gt; 2021-01-30, 2021-01-30, 2021-01-30, 2021-01-30,…
+## $ city                  &lt;chr&gt; &quot;ABILENE&quot;, &quot;ABILENE&quot;, &quot;ABILENE&quot;, &quot;ABILENE&quot;, &quot;ABI…
+## $ state                 &lt;chr&gt; &quot;TX&quot;, &quot;TX&quot;, &quot;TX&quot;, &quot;TX&quot;, &quot;TX&quot;, &quot;TX&quot;, &quot;TX&quot;, &quot;TX&quot;, …
+## $ high_or_low           &lt;chr&gt; &quot;high&quot;, &quot;high&quot;, &quot;high&quot;, &quot;high&quot;, &quot;low&quot;, &quot;low&quot;, &quot;l…
+## $ forecast_hours_before &lt;dbl&gt; 48, 36, 24, 12, 48, 36, 24, 12, 48, 36, 24, 12, …
+## $ observed_temp         &lt;dbl&gt; 70, 70, 70, 70, 42, 42, 42, 42, 29, 29, 29, 29, …
+## $ forecast_temp         &lt;dbl&gt; NA, NA, NA, 70, NA, NA, 39, 38, NA, NA, NA, 30, …
+## $ observed_precip       &lt;dbl&gt; 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, …
+## $ forecast_outlook      &lt;chr&gt; NA, NA, NA, &quot;DUST&quot;, NA, NA, &quot;DUST&quot;, &quot;SUNNY&quot;, NA,…
+## $ possible_error        &lt;chr&gt; &quot;none&quot;, &quot;none&quot;, &quot;none&quot;, &quot;none&quot;, &quot;none&quot;, &quot;none&quot;, …</code></pre>
+<pre class="r"><code>glimpse(outlook_meanings)</code></pre>
+<pre><code>## Rows: 23
+## Columns: 2
+## $ forecast_outlook &lt;chr&gt; &quot;DUST&quot;, &quot;SUNNY&quot;, &quot;MOCLDY&quot;, &quot;SNOW&quot;, &quot;PTCLDY&quot;, &quot;RAIN&quot;, …
+## $ meaning          &lt;chr&gt; &quot;Dust&quot;, &quot;Sunny&quot;, &quot;Mostly Cloudy&quot;, &quot;Snow&quot;, &quot;Partly Clo…</code></pre>
+<pre class="r"><code>## Saved data and uploaded to repository - do not need to keep saving 
 #write.csv(weather_forecasts, file = &quot;weather_forecasts.csv&quot;, row.names = FALSE)
 #write.csv(outlook_meanings, file = &quot;outlook_meanings.csv&quot;, row.names = FALSE)</code></pre>
 </div>

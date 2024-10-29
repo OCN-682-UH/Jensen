@@ -26,7 +26,7 @@ library(tidyverse)
 library(here)
 ```
 
-# Load data:
+# Load data
 
 The data for this assignment came from the tidy tuesday posted on 12/19/2022. A link to the repository can be found [here](https://github.com/rfordatascience/tidytuesday/tree/master/data/2022/2022-12-20).
 
@@ -37,8 +37,8 @@ This data describes weather forecasts and conditions across the United States ov
 weather_forecasts <- readr::read_csv('https://raw.githubusercontent.com/rfordatascience/tidytuesday/master/data/2022/2022-12-20/weather_forecasts.csv')
 outlook_meanings <- readr::read_csv('https://raw.githubusercontent.com/rfordatascience/tidytuesday/master/data/2022/2022-12-20/outlook_meanings.csv')
 
-view(weather_forecasts)
-view(outlook_meanings)
+glimpse(weather_forecasts)
+glimpse(outlook_meanings)
 
 ## Saved data and uploaded to repository - do not need to keep saving 
 #write.csv(weather_forecasts, file = "weather_forecasts.csv", row.names = FALSE)
