@@ -78,7 +78,7 @@ average_accuracy_by_state <- weather_forecasts_filtered %>%
 
             
 plot_usmap(data = average_accuracy_by_state, values = "avg_temp_accuracy", color = "white") +
-  scale_fill_gradient(low = "lightgreen", high = "darkgreen", name = "Max Temp Accuracy") + 
+  scale_fill_gradient(low = "white", high = "darkgreen", name = "Max Temp Accuracy") + 
   theme_minimal() + 
   labs(title = "Maximum Temperature Forecast Accuracy by State",
        subtitle = "Accuracy range filtered to 0-55",
@@ -107,46 +107,33 @@ weather_forecasts_HI <- weather_forecasts_HI %>%
   mutate(forecast_outlook = if_else(forecast_outlook == "WINDY", "Windy", forecast_outlook))%>%
   mutate(forecast_outlook = if_else(forecast_outlook == "TSTRMS", "Thunderstorms", forecast_outlook))
 
+weather_forecasts_HI_counts<- weather_forecasts_HI %>% 
+  group_by(forecast_outlook) %>%
+  summarise(count = n())
+
 ## View to make sure it's what I want
 view(weather_forecasts_HI)
 ```
 
 # Bad plot
-### Data manipulation
-```{r}
-outlook_counts <- weather_forecasts_HI %>%              ## call data
-  count(forecast_outlook) %>%                           ## count amount of times forecast_outlook categories come up
-  rename(word = forecast_outlook, freq = n)             ## rename columns to fit word cloud script, n is automatically created from count
-```
-
-### Plot
-```{r}
-wordcloud(words = outlook_counts$word,                                 ## call "words" aka forecast_outlook
-          freq = outlook_counts$freq,                                  ## call frequency
-          min.freq = 1,                                                ## Minimum frequency to include
-          max.words = 100,                                             ## This limits the total words displayed although we only have a few
-          random.order = FALSE,                                        ## arranges words by frequency
-          colors = c("skyblue", "gold", "lightgrey"))                   ## Colors for sunny, rainy, partly cloudy that represent the colors in nature
-```
 # Actual bad plot
 ```{r}
-  
-forecast_counts <- weather_forecasts_HI %>%
-  count(forecast_outlook) %>%   # Count occurrences of each forecast outlook
-  rename(word = forecast_outlook, freq = n)  # R
+ggplot(weather_forecasts_HI, aes(x = reorder(forecast_outlook, -count), y = 1, fill = count)) +
+  geom_tile(color = "magenta", size = 2) + 
+  geom_text(aes(label = count), size = 25, color = "yellow", angle = 90) +  
+  scale_fill_gradient(low = "limegreen", high = "red") +  
+  labs(title = "Weather Forecast Counts", x = "Forecast Outlook", y = "") +
+  theme_void() + 
+  theme(
+    plot.title = element_text(size = 20, face = "bold.italic", hjust = 0.5, color = "blue"),  
+    legend.position = "top", 
+    panel.grid.major = element_line(size = 1, color = "cyan"),  
+    panel.grid.minor = element_line(size = 1, color = "purple"),  
+    axis.text.x = element_text(size = 14, face = "bold", color = "orange", angle = 45)  
+  ) +
+  coord_fixed(ratio = 1.5)  
 
-words <- data.frame(
-  word = c("Sunny", "Rainy", "Cloudy", "Partly Cloudy", "Snow", "Fog", "Windy"),
-  freq = c(100, 80, 10000, 40, 30, 20, 10)
-)
-
-ggplot(forecast_counts, aes(x = reorder(word, freq), y = 1, fill = freq)) +
-  geom_tile() +
-  geom_text(aes(label = word), size = 4, color = "white") +
-  scale_fill_gradient(low = "lightblue", high = "darkblue") +
-  labs(title = "Weather Forecast Outlook Counts", x = "Forecast Outlook", y = "") + 
-  theme_void() +  # Remove background, grid, and axes
-  theme(legend.position = "none")  # Remove legend
+ggsave(here("Good_plot_bad_plot","Output","badplot.png"))
 
 ```
 # Good plot
@@ -174,5 +161,7 @@ ggplot(forecast_counts, aes(x = month_year,                             ## call 
        fill = "Count") +
   theme_minimal() +                                                     ## minimal theme
   theme(axis.text.x = element_text(angle = 45, hjust = 1))
+
+ggsave(here("Good_plot_bad_plot","Output","goodplot.png"))
 ```
 
