@@ -20,7 +20,48 @@ Importantly, if you decide to visualize anything by tide height it should go fro
 
 Homework due date extended for this assignment, due on Friday.
 
+# Load libraries
 ```{r}
+library(tidyverse)
+library(here)
+```
 
+```{r}
+intertidal_data_dictionary <- read_csv(here("Week09", "Data", "Homework", "intertidal_data_dictionary.csv"))
+intertidaldata_latitude <- read_csv(here("Week09", "Data", "Homework", "intertidaldata_latitude.csv"))
+intertidaldata <- read_csv(here("Week09", "Data", "Homework", "intertidaldata.csv"))
+
+
+view(intertidaldata)
+view(intertidaldata_latitude)
+view(intertidal_data_dictionary)
+```
+
+```{r}
+## amount per site, legend can be dif variables 
+## maybe just look at aninmals
+
+## y=count,x=latitude, legend = count of last three columns?
+```
+
+```{r}
+joined_data <-full_join(intertidaldata,intertidaldata_latitude)
+joined_data
+
+colnames(joined_data)
+
+joined_data_filtered <- joined_data %>%
+ pivot_longer(cols=  "Whelks (Counts)":"Stars (Counts)",
+              names_to = "Species",
+              values_to = "n") %>%
+  mutate(Latitude = round(Latitude, digits = 2)) %>%
+  select(Species, n, Latitude, Site, Quadrat)
+
+
+joined_data_filtered %>%
+   ggplot(aes(x = factor(Species), y = n)) +
+  geom_bar(stat = "identity") +
+  labs(x = "Species", y = "Count") +
+  theme_minimal()
 ```
 
