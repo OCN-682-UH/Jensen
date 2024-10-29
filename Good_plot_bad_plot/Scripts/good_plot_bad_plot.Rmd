@@ -1,0 +1,142 @@
+---
+title: "Good plot/ bad plot"
+author: "Kassandra Jensen"
+date: "2024-10-24"
+output:
+  html_document:
+    toc: TRUE
+    toc_float: TRUE
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE,
+                      warning = FALSE,
+                      messge = FALSE)
+```
+
+# Directions:
+Due October 29
+
+Create two version of similar plots, using any dataset you choose. You must create the plots using ggplot2, post-processing with Adobe Illustrator or similar is not allowed.
+Please submit your homework by posting a markdown document containing the plots, the code you used to create them, and your discussion of the plot within the markdown doc to github. Data also needs to be submitted.
+
+# Load libraries
+```{r}
+library(tidyverse)
+library(here)
+library(glue)
+```
+
+# Load data:
+
+The data for this assignment came from the tidy tuesday posted on 12/19/2022. A link to the repository can be found [here](https://github.com/rfordatascience/tidytuesday/tree/master/data/2022/2022-12-20).
+
+There are three separate data sheets that were downloaded from the repository, however only two were used in this assignment. 
+
+This data describes weather forecasts and conditions across the United States over a period of 16 months, from January 2021-June2022.
+```{r}
+weather_forecasts <- readr::read_csv('https://raw.githubusercontent.com/rfordatascience/tidytuesday/master/data/2022/2022-12-20/weather_forecasts.csv')
+outlook_meanings <- readr::read_csv('https://raw.githubusercontent.com/rfordatascience/tidytuesday/master/data/2022/2022-12-20/outlook_meanings.csv')
+
+view(weather_forecasts)
+view(outlook_meanings)
+
+## Saved data and uploaded to repository - do not need to keep saving 
+#write.csv(weather_forecasts, file = "weather_forecasts.csv", row.names = FALSE)
+#write.csv(outlook_meanings, file = "outlook_meanings.csv", row.names = FALSE)
+```
+
+# Clean Data
+```{r}
+weather_forecasts_HI <- weather_forecasts%>%          ## Call data
+  filter (state == "HI") %>%                          ## Only Hawai‘i
+  drop_na(forecast_outlook)                           ## Get rid or NAs in column
+
+## Check for which types of forecast outlooks there are 
+unique(weather_forecasts_HI$forecast_outlook)
+
+## Rename everything to unabbreviated name 
+weather_forecasts_HI <- weather_forecasts_HI %>%                                                    
+  mutate(forecast_outlook = if_else(forecast_outlook == "SUNNY", "Sunny", forecast_outlook)) %>%
+  mutate(forecast_outlook = if_else(forecast_outlook == "MOCLDY", "Mostly Cloudy", forecast_outlook))%>%
+  mutate(forecast_outlook = if_else(forecast_outlook == "PTCLDY", "Partly Cloudy", forecast_outlook))%>%
+  mutate(forecast_outlook = if_else(forecast_outlook == "SHWRS", "Rain Showers", forecast_outlook))%>%
+  mutate(forecast_outlook = if_else(forecast_outlook == "CLOUDY", "Cloudy", forecast_outlook))%>%
+  mutate(forecast_outlook = if_else(forecast_outlook == "WINDY", "Windy", forecast_outlook))%>%
+  mutate(forecast_outlook = if_else(forecast_outlook == "TSTRMS", "Thunderstorms", forecast_outlook))
+```
+
+# Bad plot
+## Data manipulation
+```{r}
+weather_forecasts_HI_counts<- weather_forecasts_HI %>% 
+  group_by(forecast_outlook) %>%
+  summarise(count = n())
+
+## View to make sure it's what I want
+view(weather_forecasts_HI_counts)
+```
+
+##### This is a bad plot because:
+- Missing key factors that make this data useful
+
+- Ugly colors
+
+- Font size too big 
+
+- Inappropriate use of emojis
+```{r}
+ggplot(weather_forecasts_HI_counts, aes(x = reorder(forecast_outlook, -count), y = 1, fill = count)) +
+  geom_tile(color = "magenta", size = 2) + 
+  geom_text(aes(label = count), size = 23, color = "yellow", angle = 90) +  
+  scale_fill_gradient(low = "limegreen", high = "red") +  
+  labs(title = expression(paste("😎 Weather Forecast Counts 🌧")),
+                                x = "Forecast Outlook", y = "") +
+  theme_void() + 
+  theme(
+    plot.title = element_text(size = 20, face = "bold.italic", hjust = 0.5, color = "blue"),  
+    legend.position = "top", 
+    panel.grid.major = element_line(size = 1, color = "cyan"),  
+    panel.grid.minor = element_line(size = 1, color = "purple"),  
+    axis.text.x = element_text(size = 14, face = "bold", color = "orange", angle = 45)  
+  ) +
+  coord_fixed(ratio = 1.5)  
+
+ggsave(here("Good_plot_bad_plot","Output","badplot.png"))
+```
+# Good plot
+### Data manipulation
+```{r}
+weather_forecasts_HI <- weather_forecasts_HI %>%   ## call data
+  mutate(month_year = floor_date(date, "month"))   ## round data to nearest month 
+
+forecast_counts <- weather_forecasts_HI %>%        ## call data
+  group_by(month_year, forecast_outlook) %>%       ## group by date and forecast because that's all we care about
+  summarise(count = n()) %>%                       ## n() counts the unique observations of what I put in groupby() 
+  ungroup()  
+
+```
+
+### Plot
+##### This is a good plot because:
+- Clear title and subtitle showcasing location and what the plot is trying to represent
+
+- Aesthetics (font, colors, sizing) do not take away from the data being conveyed
+
+- Heat map conveys meaningful densities overtime for comparisons
+```{r}
+ggplot(forecast_counts, aes(x = month_year,                             ## call data, put month_year as x axis
+                            y = forecast_outlook)) +                    ## forecast as y- axis
+  geom_tile(aes(fill = count), color = "white") +                       ## use geom_tile for heat map
+  scale_fill_gradient(low = "lightblue", high = "darkblue") +           ## pretty colors
+  labs(title = "Temporal Analysis of Weather Forecasts",                ## titles
+       subtitle = "1.5 Years of Honolulu Weather Data",
+       x = "Month-Year",
+       y = "Forecast",
+       fill = "Count") +
+  theme_minimal() +                                                     ## minimal theme
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+
+ggsave(here("Good_plot_bad_plot","Output","goodplot.png"))
+```
+
