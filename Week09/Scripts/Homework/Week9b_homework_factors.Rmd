@@ -2,30 +2,26 @@
 title: "Week 9b Homework"
 author: "Kassandra Jensen"
 date: "2024-10-29"
-output: html_document
+output: 
+  html_document:
+    toc: TRUE
 ---
 
 ```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE)
+knitr::opts_chunk$set(echo = TRUE,
+                      warning = FALSE,
+                      message = FALSE)
 ```
 
 # Directions
-Working with intertidal data. Today you will need to use skills that you have learned in working with words to clean up some issues with the character data and use what you learned today to reorder your factors into orders that make sense. (Also the column headers could be better...). HINT: New package idea to fix this is using the janitor package.
-
-Your goal, as per usual, is to make a plot, any plot where one of the axes is a factor. Save everything in the appropriate folders.
-
-You have two possible files to play with in the data folder (you don't HAVE to use both): intertidal.csv and intertidal_latitude.csv (as well as a data dictionary)
-
-Importantly, if you decide to visualize anything by tide height it should go from low to mid to high tide on the plot and if you decide to visualize by site it should go in order of latitude (e.g. south to north or north to south).
-
-Homework due date extended for this assignment, due on Friday.
+Working with intertidal data. Today you will need to use skills that you have learned in working with words to clean up some issues with the character data and use what you learned today to reorder your factors into orders that make sense. (Also the column headers could be better...). HINT: New package idea to fix this is using the janitor package._Your goal, as per usual, is to make a plot, any plot where one of the axes is a factor. Save everything in the appropriate folders._ You have two possible files to play with in the data folder (you don't HAVE to use both): intertidal.csv and intertidal_latitude.csv (as well as a data dictionary). Importantly, if you decide to visualize anything by tide height it should go from low to mid to high tide on the plot and if you decide to visualize by site it should go in order of latitude (e.g. south to north or north to south). Homework due date extended for this assignment, due on Friday.
 
 # Load libraries
 ```{r}
 library(tidyverse)
 library(here)
 ```
-
+# Read data
 ```{r}
 intertidal_data_dictionary <- read_csv(here("Week09", "Data", "Homework", "intertidal_data_dictionary.csv"))
 intertidaldata_latitude <- read_csv(here("Week09", "Data", "Homework", "intertidaldata_latitude.csv"))
@@ -36,32 +32,40 @@ view(intertidaldata)
 view(intertidaldata_latitude)
 view(intertidal_data_dictionary)
 ```
-
-```{r}
-## amount per site, legend can be dif variables 
-## maybe just look at aninmals
-
-## y=count,x=latitude, legend = count of last three columns?
-```
-
+# Join data
 ```{r}
 joined_data <-full_join(intertidaldata,intertidaldata_latitude)
 joined_data
+```
 
-colnames(joined_data)
+# Clean Data 
+```{r}
+joined_data_filtered <- joined_data %>%                                       ## call data
+ pivot_longer(cols=  "Whelks (Counts)":"Stars (Counts)",                      ## select columns for pivot
+              names_to = "Species",                                           ## New column name
+              values_to = "n") %>%                                            ## new column name
+  select(Species, n, Latitude, Site, Quadrat)                                 ## select the columns I'm interested in
 
-joined_data_filtered <- joined_data %>%
- pivot_longer(cols=  "Whelks (Counts)":"Stars (Counts)",
-              names_to = "Species",
-              values_to = "n") %>%
-  mutate(Latitude = round(Latitude, digits = 2)) %>%
-  select(Species, n, Latitude, Site, Quadrat)
+## Look at diff names of each quadrat type
+unique(joined_data_filtered$Quadrat)
 
+## Get rid of white space, periods, numbers in quadrat names and filter only for low tide
+joined_data_low <- joined_data_filtered %>%
+  mutate(Quadrat = str_replace_all(Quadrat, pattern = "[\\s\\.]", replacement = "")) %>%
+  mutate(Quadrat = str_replace_all(Quadrat, pattern = "[0-9]", replacement = "")) %>%
+  filter(Quadrat == "Low")
+```
 
-joined_data_filtered %>%
-   ggplot(aes(x = factor(Species), y = n)) +
-  geom_bar(stat = "identity") +
-  labs(x = "Species", y = "Count") +
+# Make plot
+```{r}
+ggplot(joined_data_low, aes(x = n, y = fct_reorder(Site, Latitude))) +
+  stat_summary(fun = "mean", geom = "bar", position = "dodge") +
+  labs(title= "Species Counts by site",
+       subtitle = "Whelks, Crabs, and Stars at low tide",
+      x = "Count", 
+       y = "Site Name") +
   theme_minimal()
+
+ggsave(here("Week09", "Output", "Homework", "Homework_week9B.png"))
 ```
 
