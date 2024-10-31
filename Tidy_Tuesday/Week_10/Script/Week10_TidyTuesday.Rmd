@@ -1,0 +1,67 @@
+---
+title: "Week10_TidyTuesday"
+author: "Kassandra Jensen"
+date: "2024-10-31"
+output: 
+  html_document:
+    TOC: TRUE
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+# Libraries
+```{r}
+library(here)
+library(tidyverse)
+library(gganimate)
+```
+
+# Read in data
+```{r}
+monster_movie_genres <- readr::read_csv('https://raw.githubusercontent.com/rfordatascience/tidytuesday/master/data/2024/2024-10-29/monster_movie_genres.csv')
+monster_movies <- readr::read_csv('https://raw.githubusercontent.com/rfordatascience/tidytuesday/master/data/2024/2024-10-29/monster_movies.csv')
+
+
+view(monster_movie_genres)
+view(monster_movies)
+
+## look at all the types of genres
+unique(monster_movie_genres$genres)
+```
+# Join data
+```{r}
+monster_genre <- left_join(monster_movies, monster_movie_genres, join_by("tconst"))
+
+view(monster_genre)
+  
+```
+
+# Something new to me: animation
+I know we learned this in class together, but I've never done it in a plot by myself before.
+```{r}
+filtered_movies <- monster_genre %>%                                      ## Call data
+  filter(genres.y == c("Horror")) %>%                                     ## Select only horror genre          
+  filter(year %in% c("1975":"2025")) %>%                                  ## select years
+  group_by(year, genres.y) %>%                                            ## group data by year and genre
+  summarise(average_rating = mean(average_rating, na.rm = TRUE)) %>%      ## calculate average rating for each year
+  ungroup()                                                               ## ungroup to avoid issues
+
+## Make standard line plot
+p <- ggplot(filtered_movies, aes(x = year,                                ## map by year and rating
+                                 y = average_rating)) +
+  geom_line(size = 1) +                                                   ## Change size of lines
+  geom_point(size = 2) +
+  labs(title = 'Average Horror Ratings of Genres Over Time',              ## add labels 
+       x = 'Year', 
+       y = 'Average Rating') +
+  theme_minimal() +
+  transition_reveal(year) +                                               ## Animate the line drawing
+  ease_aes('linear')                                                      ## Use a linear easing function
+
+## save animation
+anim <- animate(p, renderer = gifski_renderer(), height = 400, width = 600, duration = 10)
+anim_save(here("Tidy_Tuesday", "Week_10", "Output", "horror_ratings_overtime.gif"), animation = anim)
+
+```
+
