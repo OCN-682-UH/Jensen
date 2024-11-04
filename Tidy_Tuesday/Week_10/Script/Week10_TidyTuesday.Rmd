@@ -60,8 +60,11 @@ p <- ggplot(filtered_movies, aes(x = year,                                ## map
   ease_aes('linear')                                                      ## Use a linear easing function
 
 ## save animation
-anim <- animate(p, renderer = gifski_renderer(), height = 400, width = 600, duration = 10)
-anim_save(here("Tidy_Tuesday", "Week_10", "Output", "horror_ratings_overtime.gif"), animation = anim)
+##### I had to comment out the following two lines because the file was too large to knit. You can see the finished animation in my outputs folder though. :)
+
+
+# anim <- animate(p, renderer = gifski_renderer(), height = 400, width = 600, duration = 10)
+# anim_save(here("Tidy_Tuesday", "Week_10", "Output", "horror_ratings_overtime.gif"), animation = anim)
 
 ```
 
