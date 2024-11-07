@@ -1,0 +1,163 @@
+---
+title: "Week 11 Tidy Tuesday"
+author: "Kassandra Jensen"
+date: "2024-11-07"
+output: 
+  html_document:
+    toc: TRUE
+    toc_float: TRUE
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+# Week 11 Tidy Tuesday: Democracy Data
+
+# Load libraries
+```{r}
+library(democracyData)
+library(tidyverse)
+library(patchwork)
+```
+
+# Read in Data
+This data comes from the tidytuesday data for November 11, 2024 and can be found [here](https://github.com/rfordatascience/tidytuesday/blob/master/data/2024/2024-11-05/readme.md).
+There is data manipulation/ clean-up that was suggested on the repo for this data set which is what you see below.
+```{r}
+democracy_data <- readr::read_csv('https://raw.githubusercontent.com/rfordatascience/tidytuesday/master/data/2024/2024-11-05/democracy_data.csv')
+
+## Clean up data
+## Taken rom repository
+democracy_data <-
+  democracyData::pacl_update |> 
+  janitor::clean_names() |> 
+  dplyr::select(
+    "country_name" = "pacl_update_country",
+    "country_code" = "pacl_update_country_isocode",
+    "year",
+    "regime_category_index" = "dd_regime",
+    "regime_category" = "dd_category",
+    "is_monarchy" = "monarchy",
+    "is_commonwealth" = "commonwealth",
+    "monarch_name",
+    "monarch_accession_year" = "monarch_accession",
+    "monarch_birthyear",
+    "is_female_monarch" = "female_monarch",
+    "is_democracy" = "democracy",
+    "is_presidential" = "presidential",
+    "president_name",
+    "president_accesion_year" = "president_accesion",
+    "president_birthyear",
+    "is_interim_phase" = "interim_phase",
+    "is_female_president" = "female_president",
+    "is_colony" = "colony",
+    "colony_of",
+    "colony_administrated_by",
+    "is_communist" = "communist",
+    "has_regime_change_lag" = "regime_change_lag",
+    "spatial_democracy",
+    "parliament_chambers" = "no_of_chambers_in_parliament",
+    "has_proportional_voting" = "proportional_voting",
+    "election_system",
+    "lower_house_members" = "no_of_members_in_lower_house",
+    "upper_house_members" = "no_of_members_in_upper_house",
+    "third_house_members" = "no_of_members_in_third_house",
+    "has_new_constitution" = "new_constitution",
+    "has_full_suffrage" = "fullsuffrage",
+    "suffrage_restriction",
+    "electoral_category_index" = "electoral",
+    "spatial_electoral",
+    "has_alternation" = "alternation",
+    "is_multiparty" = "multiparty",
+    "has_free_and_fair_election" = "free_and_fair_election",
+    "parliamentary_election_year",
+    "election_month" = "election_month_year",
+    "has_postponed_election" = "postponed_election"
+  ) |>
+  dplyr::mutate(
+    election_month = dplyr::na_if(.data$election_month, "?")
+  ) |> 
+  tidyr::separate_wider_regex(
+    "election_month",
+    patterns = c(
+      election_month = "\\D+",
+      election_year = "\\d{4}$"
+    ),
+    too_few = "align_start"
+  ) |> 
+  dplyr::mutate(
+    electoral_category = dplyr::case_match(
+      .data$electoral_category_index,
+      0 ~ "no elections",
+      1 ~ "single-party elections",
+      2 ~ "non-democratic multi-party elections",
+      3 ~ "democratic elections"
+    ),
+    .after = "electoral_category_index"
+  ) |> 
+  dplyr::mutate(
+    election_month = stringr::str_squish(.data$election_month),
+    dplyr::across(
+      c(
+        tidyselect::ends_with("_index"),
+        tidyselect::contains("year"),
+        tidyselect::ends_with("_members"),
+        "parliament_chambers"
+      ),
+      as.integer
+    ),
+    dplyr::across(
+      c(
+        tidyselect::starts_with("is_"),
+        tidyselect::starts_with("has_")
+      ),
+      as.logical
+    )
+  )
+
+view(democracy_data)
+
+## Checking values
+unique(democracy_data$is_female_monarch)
+```
+
+# Learn one new thing
+I decided to learn to make a population pyramid. These are typically used to look at number of people at different age groups and genders, living in specific places. I followed this [website](https://www.geeksforgeeks.org/how-to-create-a-population-pyramid-in-r/) as a resource to learn how to do this. 
+
+The important part about this actually comes from the _data manipulation_, rather than code for a plot. You just make one of the groups negative, the change the axis labels so it can actually be displayed as positive. 
+
+### Manipulate data
+```{r}
+democracy_data_filt <- democracy_data %>%                                 ## get data and rename
+  select(year, is_female_monarch) %>%                                     ## select only columns year and gender
+  filter(!is.na(is_female_monarch)) %>%                                   ## remove NAs for useful data
+  mutate(monarch_gender = ifelse(is_female_monarch == "TRUE", "Female", "Male"))%>%  ## Change true/false to Female/Male
+  group_by(year, monarch_gender) %>%                                      ## group by year and gender
+  summarise(count = n(), .groups = 'drop') %>%                            ## get counts for each group
+  mutate(count = ifelse(monarch_gender=="Female", count*(-1),count*1))    ## change female counts to negative for graph
+
+```
+
+### Make plot
+```{r}
+ggplot(democracy_data_filt, aes(x = year,                               ## call data and x, y, and fill
+                                y = count, 
+                                fill=monarch_gender)) +  
+    geom_bar(stat = "identity") +                                       ## use bar plot
+    coord_flip()+                                                       ## flip the axis
+  scale_y_continuous(                                                  
+    limits = c(-35, 35),                                                ## change the scales for aesthetic purposes
+    breaks = seq(-40, 40, 10),                                          ## place breaks where I want them
+    labels = abs(seq(-40, 40, 10))                                      ## use absolute values for female side so it's consistent
+  ) + 
+  scale_fill_manual(values = c("Female" = "darkblue", "Male" = "lightblue")) +  ## change the colors
+   labs(title = "Comparison of Ruler Gender from 1950-2020",                    ## change names of title, axis, and legend
+        x = "Year",  
+        y = "Number of Rulers", 
+        fill = "Gender") + 
+  theme_minimal()                                                       ## minimal theme
+
+ggsave("ruler_gender.png", width = 8, height = 6)            ## Save plot
+
+```
+
