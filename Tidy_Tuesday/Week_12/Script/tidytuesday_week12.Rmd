@@ -1,0 +1,63 @@
+---
+title: "Tidy Tuesday Week 12"
+author: "Kassandra Jensen"
+date: "2024-11-14"
+output: 
+  html_document:
+    code_folding: hide
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+# Load libraries
+```{r}
+library(here)
+library(tidyverse)
+```
+
+# Read in data
+```{r}
+countries <- readr::read_csv('https://raw.githubusercontent.com/rfordatascience/tidytuesday/master/data/2024/2024-11-12/countries.csv')
+country_subdivisions <- readr::read_csv('https://raw.githubusercontent.com/rfordatascience/tidytuesday/master/data/2024/2024-11-12/country_subdivisions.csv')
+former_countries <- readr::read_csv('https://raw.githubusercontent.com/rfordatascience/tidytuesday/master/data/2024/2024-11-12/former_countries.csv')
+
+head(countries)
+head(country_subdivisions)
+head(former_countries)
+```
+# Data Manipulations
+Extract year from dates and get counts for each year.
+```{r}
+withdrawals_per_year <- former_countries %>%
+  mutate(year = substr(date_withdrawn, 1, 4)) %>%                  ## Extract the first 4 characters (in this case- year)
+  group_by(year) %>%                                               ## Group by year
+  summarise(count = n()) %>%                                       ## get nuber of occurences
+  arrange(year)
+
+withdrawals_per_year$year <- as.numeric(withdrawals_per_year$year) ## make year numeric
+ 
+```
+
+# Graph
+Making a graph showing number of countries that have been withdrawn over time.
+This is super basic but I had *no inspiration* for this data set and I did NOT want to make a map.
+```{r}
+ggplot(withdrawals_per_year, aes(x = year, y = count)) +           ## data, x and y
+   geom_bar(stat = "identity", fill = "darkblue") +               ## use geom bar
+  labs(
+    title = "Number of Countries Withdrawing Per Year",           ## title and labels
+    x = "Year",
+    y = "Number of Countries"
+  ) +
+  theme_minimal() +                                               ## minimal theme
+  coord_flip()                                                    ## flip axis
+
+ggsave("Withdrawals.png")
+```
+
+# New thing I learned:
+I learned how to fold code chunks in R markdown! I makes it so that the code can be hidden and you only get outputs. So simple! I really appreciate it because sometimes all you care about it the output. 
+
+
+
