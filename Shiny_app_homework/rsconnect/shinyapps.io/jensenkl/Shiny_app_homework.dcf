@@ -1,0 +1,12 @@
+name: Shiny_app_homework
+title: Shiny_app_homework
+username: jensenkl
+account: jensenkl
+server: shinyapps.io
+hostUrl: https://api.shinyapps.io/v1
+appId: 13382724
+bundleId: 9384831
+url: https://jensenkl.shinyapps.io/Shiny_app_homework/
+version: 1
+asMultiple: FALSE
+asStatic: FALSE
