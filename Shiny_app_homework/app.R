@@ -24,6 +24,10 @@ view(filtered_movies)
 
 # Make shiny
 ui <- fluidPage(
+  titlePanel("MBIO 612: Shiny App"),
+  p("Created by: Kassie Jensen"),
+  p("For this homework assignment, I used the tidy tuesday data from October 29, 2024 that showed movie ratings according to genre."),
+  p("You can select different genres from the selection box and see how their ratings have changed overtime."),
       selectInput(inputId = "selected_genre",
                   label = "Choose a Genre",
                   choices = unique(filtered_movies$genres.y),

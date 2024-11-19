@@ -5,7 +5,7 @@ account: jensenkl
 server: shinyapps.io
 hostUrl: https://api.shinyapps.io/v1
 appId: 13382724
-bundleId: 9384831
+bundleId: 9387619
 url: https://jensenkl.shinyapps.io/Shiny_app_homework/
 version: 1
 asMultiple: FALSE
