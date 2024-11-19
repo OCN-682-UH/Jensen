@@ -9,7 +9,6 @@
 ##### I'm looking forward to seeing what we will learn!
 
 
-## Shiny app:
-I am _NOT_ done!! Don't look yet!
+## Shiny app homework:
 
 [Movie Genres](https://jensenkl.shinyapps.io/Shiny_app_homework/)
