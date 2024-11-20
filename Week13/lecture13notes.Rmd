@@ -1,0 +1,81 @@
+---
+title: "Week 13 Notes- How to ask for help"
+author: "Kassandra Jensen"
+date: "2024-11-19"
+output: html_document
+---
+
+```{r}
+library(reprex)
+library(datapasta)
+library(styler)
+```
+
+```{r}
+library(tidyverse)
+mpg %>%
+  ggplot(aes(x = displ, y = hwy))%>%
+  geom_point(aes(color = class))
+```
+
+```{r}
+lat,long,star_no
+33.548,-117.805,10
+35.534,-121.083,1
+39.503,-123.743,25
+32.863,-117.24,22
+33.46,-117.671,8
+
+data <- tibble::tribble(
+    ~lat,    ~long, ~star_no,
+  33.548, -117.805,      10L,
+  35.534, -121.083,       1L,
+  39.503, -123.743,      25L,
+  32.863,  -117.24,      22L,
+   33.46, -117.671,       8L
+  )
+
+### helps if you need to share a snippet of code and not thousands of lines
+
+```
+
+```{r}
+stars <- read.csv("stars.csv")
+
+view(stars)
+```
+
+## Our sample mistake
+```{r}
+library(tidyverse)
+
+stars <- tibble::tribble(
+    ~lat,    ~long, ~star_no,
+  33.548, -117.805,      10L,
+  35.534, -121.083,       1L,
+  39.503, -123.743,      25L,
+  32.863,  -117.24,      22L,
+   33.46, -117.671,       8L
+  )
+
+ggplot(stars, aes(x= latitude, y = star_no)) +
+  geom_col() +
+  labs(title = "Number of stars across latitude",
+       x = "Latitude",
+       y = "Number of stars")
+```
+## Fixing classmates sample mistake 
+```{r}
+head(diamonds)
+#> Error in head(diamonds): object 'diamonds' not found
+
+diamonds%>%
+ggplot(aes(x = carat, y = price)) + 
+      geom_point(aes(color = clarity), alpha = 0.5) +  # color by clarity
+      labs(title = paste("Price vs Carat for"), #needed chatgpt, somehow this makes the reactive labels 
+           x = "Carat", 
+           y = "Price") +
+      theme_minimal()
+```
+
+
