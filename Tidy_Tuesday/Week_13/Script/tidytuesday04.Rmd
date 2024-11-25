@@ -34,7 +34,7 @@ ggplot(episode_metrics, aes(x= avg_length, y= question_ratio, color = season))+
 ```
 
 # One new thing I learned:
-I learned how to embed a spotify link, so that it pops up with the audio of your choice. Unfortunately, in this case, the user would need to have spotify. Now you can play a nice Bob's Burgers song in the background while enjoying your Bob's Burgers visual!
+I learned how to embed a spotify link, so that it pops up with the audio of your choice. Unfortunately, in this case, the user would need to have spotify. *The markdown also must be viewed in a browser*. Now you can play a nice Bob's Burgers song in the background while enjoying your Bob's Burgers visual!
 
 
 There are multiple ways to do this actually, but I found that the best was just changing the output to HTML and putting the link provided by spotify. You can also follow the directions from this (forum link)[https://forum.posit.co/t/how-do-i-embed-a-spotify-song-in-rmarkdown/116809/2] for an alternate way to do this. 
