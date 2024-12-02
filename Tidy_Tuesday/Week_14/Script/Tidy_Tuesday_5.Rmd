@@ -1,0 +1,57 @@
+---
+title: 'Tidy Tuesday #5/ Week 14'
+author: "Kassandra Jensen"
+date: "2024-11-26"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Load Libraries
+```{r}
+library(tidyverse)
+library(plotly)
+```
+
+# Load Data
+```{r}
+cbp_resp <- readr::read_csv('https://raw.githubusercontent.com/rfordatascience/tidytuesday/master/data/2024/2024-11-26/cbp_resp.csv')
+cbp_state <- readr::read_csv('https://raw.githubusercontent.com/rfordatascience/tidytuesday/master/data/2024/2024-11-26/cbp_state.csv')
+```
+***
+# Edit Data
+```{r}
+cbp_resp<- cbp_resp %>%                    
+  filter(land_border_region != "Other")                  ## filter land_border_region labeled "Other"
+```
+***
+
+# Make graph
+```{r}
+p <- ggplot(cbp_resp, aes(x = encounter_type, y = encounter_count)) +                  ## Choose variables for x and y
+  geom_bar(stat = "identity", fill = "darkblue") +                                                       ## geom_bar, change fill
+  facet_wrap(~factor(land_border_region, c("Northern Land Border", "Southwest Land Border", "Other"))) + ## facet wrap to should different land regions
+  labs(title = "Number of Encounter Types at each Land Border Region ",                                 ## Labels + a caption for more information
+       x= "Encounter Type",
+       y= "Number of Individuals",
+       caption = "Visit https://www.cbp.gov/newsroom/stats/cbp-enforcement-statistics/title-8-and-title-42-statistics for information on which encounters qualify under Apprehension, Inadmissable, or Explusion.") +
+  theme_minimal() +                                                                                        ## Theme minimal
+  scale_y_continuous(labels = scales::comma)  ## get rid of scientific notation on y axis
+
+ggsave("tidytuesday05.png", height = 10, width = 15)
+
+```
+
+# Make interactive interactive using plotly
+```{r}
+ggplotly(p) ## package plotly can make the graph interactive. Now you can see exact values on each of the bars.  
+```
+
+# New things I learned: 
+1.  How to make an interactive graph using library(plotly)
+
+2.  You can add lines in between chunks by using writing three stars like this: ***. 
+
+
