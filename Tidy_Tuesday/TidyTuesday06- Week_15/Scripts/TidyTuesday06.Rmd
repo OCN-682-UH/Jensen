@@ -1,0 +1,93 @@
+---
+title: "Tidy Tuesday 06"
+author: "Kassandra Jensen"
+date: "2024-12-02"
+output: 
+  prettydoc::html_pretty:
+    theme: hpstr
+    toc: yes
+---
+
+```{r setup, include=FALSE} 
+knitr::opts_chunk$set(warning = FALSE, message = TRUE) 
+```
+***
+# Libraries
+```{r}
+library(tidyverse)
+library(gganimate)
+library(prettydoc)
+```
+***
+# Data
+```{r}
+A64_traffic <- readr::read_csv('https://raw.githubusercontent.com/rfordatascience/tidytuesday/main/data/2024/2024-12-03/A64_traffic.csv')
+```
+***
+# Data manipulation
+Made the data frame longer, so I could graph the counts. 
+```{r}
+A64_traffic_long <- A64_traffic %>%
+  pivot_longer(cols = '0 - 520 cm':'1160+ cm',
+               names_to = "car_length",
+               values_to = "count_length") %>%
+  pivot_longer(cols = '0 - 10 mph':'80+ mph',
+               names_to = "speed",
+               values_to = "count_speed")
+```
+***
+# Plot
+This plot helped to get an initial understanding of the data and any trends.
+```{r}
+ggplot(A64_traffic_long, aes(x = speed, y = count_speed, fill = car_length)) +
+  geom_bar(stat = "identity") +
+  labs(
+    title = "Distribution of Vehicle Speeds",
+    x = "Speed Category (mph)",
+    y = "Count of Vehicles",
+    fill = "Car Length (cm)"
+  ) +
+  theme_minimal() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+
+```
+***
+# Final Plot
+I wanted to see if there were any big changes overtime. It seems like Fridays always had the most cars on the road. 
+
+
+I had to comment out the animation because it wouldn't knit. Sorry!
+```{r}
+animated_plot <- ggplot(A64_traffic_long, aes(x = speed, y = count_speed, fill = car_length)) + ## make plot
+  geom_bar(stat = "identity", position = "stack") +                                             ## bar plot + stack keeps the different groups stacked on one another
+  labs(
+    title = "Distribution of Vehicle Speeds Over Time",                                         ## Labels
+    subtitle = "Date: {May 1 - May 31, 2024}",
+    x = "Speed Category (mph)",
+    y = "Count of Vehicles",
+    fill = "Car Length (cm)"
+  ) + 
+  theme_minimal() +                                                                             ## minimal theme
+  theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
+  transition_time(as.Date(`Report Date`)) +                                                     ## animate over the report date
+  ease_aes("linear")                                                                            ## makes it have smooth transitions
+
+
+# Make the plot render a little bit slower to see more easiry
+#animate(animated_plot, 
+#        width = 800, 
+#        height = 600, 
+#        fps = 5,                                                                                ## fewer frames per second 
+#        duration = 20)                                                                          ## total animation duration
+```
+***
+# Save animation
+I had to comment this out as well to get it to knit. Sorry about that. 
+```{r}
+# animate(animated_plot, width = 800, height = 600, fps = 5)
+# anim_save("animated_traffic_plot.gif")
+```
+
+# New things I learned:
+I learned how to change the R markdown theme using the *prettydoc* package. There are a ton of other themes to use. I found this one on this [website](https://rpubs.com/ranydc/rmarkdown_themes#:~:text=To%20apply%20a%20theme%20to,the%20beginning%20of%20your%20document).  
+
