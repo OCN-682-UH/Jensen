@@ -1,0 +1,63 @@
+---
+title: "Tidy Tuesday 07"
+author: "Kassandra Jensen"
+date: "2024-12-03"
+output: tufte::tufte_html
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+***
+# Libraries
+```{r message = FALSE, warning = FALSE}
+library(tidyverse)
+library(plotly)
+library(tufte)
+library(htmlwidgets)
+```
+***
+# Data
+```{r message = FALSE, warning = FALSE}
+parfumo_data_clean <- readr::read_csv('https://raw.githubusercontent.com/rfordatascience/tidytuesday/main/data/2024/2024-12-10/parfumo_data_clean.csv')
+```
+***
+# Clean data
+Because the data set was so large, I filtered for only points that had a value for release year and rating value. I then cut off the release year at 1975, because there weren't as many points available prior to that, and what was available was skewing the regression line. I also only included perfumes that were rated at least 400 times or more. 
+
+```{r}
+parfumo_data_cleaner <- parfumo_data_clean %>%
+  filter(Release_Year != 0) %>%
+  filter(Rating_Value != 0) %>%
+  filter(Release_Year >= 1975) %>%
+  filter(Rating_Count >= 400)
+```
+***
+# Plot the data
+```{r message = FALSE, warning = FALSE}
+plot <- ggplot(parfumo_data_cleaner, aes(x = Release_Year, y = Rating_Value)) +        ## Choose x and y values
+  geom_point(aes(text = paste("Name:", Name,                                           ## choose information for interactive data
+                              "<br>Year:", Release_Year,
+                              "<br>Rating:", Rating_Value))) +
+  geom_smooth(method = "lm", color = "darkblue") +                                    ## use linear model method for trend
+  labs(title = "Perfume ratings over time",                                           # labels
+       x= "Release Year",
+       y= "Rating" 
+       ) +
+ theme_linedraw()                                                                    ## minimal theme
+
+ggplotly(plot, tooltip = "text")               ## use ggplotly to make graph interactive, toolip to specify what information is shown
+```
+
+# Save at HTML 
+```{r message = FALSE, warning = FALSE}
+interactive_plot <- ggplotly(plot, tooltip = "text")
+saveWidget(interactive_plot, file = "interactive_parfume_plot.html")
+```
+
+# New things I learned:
+1. I learned how to add exactly what I want into the information you get when you animate a graph using plotly. In this case, I wanted to add the name of the perfume, which I was able to do in the geom_point aestheitcs, then specify later using the ggplotly function. 
+
+2. I also used another markdown theme from the tufte package. It looks pretty and would be good for written documents. 
+
+3. I played around with different themes and used a new one. I'm not sure if it counts as learning something new but I definitely learned a lot by going through each one. :)
