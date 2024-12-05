@@ -1,0 +1,139 @@
+---
+title: "Week16Homework"
+author: "Kassandra Jensen"
+date: "2024-12-05"
+output: 
+  html_document:
+    toc: true
+    toc_float: true
+---
+
+# Directions
+Bring in all 4 files and calculate the mean and standard deviation of both temperature (Temp.C) and light (Intensity.lux) for each tide pool. Use both a for loop and map() functions in your script. (Basically, do it twice).
+
+I am going to break it down step by step like we did in class because it's easier for me to understand that way.
+
+# Libraries
+```{r}
+library(tidyverse)
+library(here)
+```
+
+# Loop 
+```{r}
+#test out to make sure it will read at least one file:
+datadata<-read_csv(here("Week15", "Homework","data", "TP1.csv"))
+glimpse(datadata)
+colnames(datadata)
+
+## Establish the pathway
+data_path<-here("Week15", "Homework","data")
+            
+## Find everything in this folder ending in ".csv"
+homework_files <- dir(path = data_path, pattern = ".csv")
+homework_files
+```
+## Make empty data frame
+```{r}
+homework_data<-tibble(filename =  rep(NA, length(homework_files)),  # column name for pool
+                   mean_temp = rep(NA, length(homework_files)), # column name for the mean temperature
+                   mean_lux = rep(NA, length(homework_files)), # column name for the mean light
+                   sd_temp = rep(NA, length(homework_files)), # column names standard deviation of temp
+                   sd_lux = rep(NA, length(homework_files)) # column name for standard deviation of lux
+                   ) 
+homework_data
+```
+## Read file to see if this works
+```{r}
+raw_HW_data<-read_csv(paste0(data_path,"/",homework_files[1])) # test by reading in the first file and see if it works
+head(raw_HW_data)
+```
+
+## Calculate mean
+```{r}
+mean_temp_HW <-mean(raw_HW_data$Temp.C, na.rm = TRUE) # calculate a mean of the one we tested out
+mean_temp_HW
+```
+## Make simple loop
+```{r}
+for (i in 1:length(homework_files)){ # loop over 1:4 the number of files
+}
+```
+
+## Add in the loop over the raw data
+```{r}
+for (i in 1:length(homework_files)){ # loop over 1:4 the number of files 
+raw_HW_data<-read_csv(paste0(data_path,"/",homework_files[i])) ## read the file like we made earlier
+#glimpse(raw_HW_data)  ## glimpse to make sure it looks okay
+}
+```
+## Add in filename for each row
+```{r}
+for (i in 1:length(homework_files)){ # loop over 1:4 the number of files 
+raw_HW_data<-read_csv(paste0(data_path,"/",homework_files[i])) ## create path to read all the files
+homework_data$filename[i]<-homework_files[i]                  ## 
+} 
+homework_data
+```
+
+## Finished loop!
+```{r}
+for (i in 1:length(homework_files)){ # loop over 1:4 the number of files 
+  raw_HW_data<-read_csv(paste0(data_path,"/",homework_files[i]))  ## read in data and include in loop
+  homework_data$filename[i]<-homework_files[i]                          ## add file names for each row
+  homework_data$mean_temp[i]<-mean(raw_HW_data$Temp.C, na.rm =TRUE)    ## calculate mean temp and assign name
+  homework_data$mean_lux[i]<-mean(raw_HW_data$Intensity.lux, na.rm =TRUE)  ## calculate mean temp and assign name
+  homework_data$sd_temp[i]<-sd(raw_HW_data$Temp.C, na.rm =TRUE)  ## calculate sd temp and assign name
+  homework_data$sd_lux[i]<-sd(raw_HW_data$Intensity.lux, na.rm =TRUE) ## calculate sd lux and assign name
+} 
+homework_data ## check to make sure it worked!
+```
+
+# Map function
+Okay, now we do the same thing but using the map function instead of a loop.
+## Get files
+I'm using the same path as before.
+```{r}
+data_path<-here("Week15", "Homework","data")
+homework_files <- dir(path = data_path, pattern = ".csv", full.names = TRUE) ## Had to make full.names= True, maybe bc my working directory isn't the same as my data directory?
+
+homework_files
+```
+## Read in the files using map
+```{r}
+HW_data<- homework_files %>%
+  set_names()%>% # set's the id of each list to the file name
+  map_df(read_csv,.id = "filename") # map everything to a dataframe and put the id in a column called filename
+HW_data
+```
+## Calculate means and sds
+```{r}
+HW_data<-homework_files %>%
+  set_names()%>% # set's the id of each list to the file name
+  map_df(read_csv,.id = "filename") %>% # map everything to a dataframe and put the id in a column called filename
+  group_by(filename) %>%
+  summarise(mean_temp = mean(Temp.C, na.rm = TRUE),
+            mean_lux = mean(Intensity.lux,na.rm = TRUE),
+            sd_temp = sd(Temp.C, na.rm = TRUE),
+            sd_lux = sd(Intensity.lux,na.rm = TRUE)
+            )%>%
+  mutate(filename = basename(filename))  ## Because I used row.names = true, it gave me the whole path to these files and was really ugly so i used this code to extract only the basename of the file!
+HW_data
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
